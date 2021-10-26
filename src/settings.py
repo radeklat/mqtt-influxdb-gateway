@@ -1,17 +1,10 @@
 from functools import cache
 from typing import Literal, Union
 
-from pydantic import BaseSettings, Field, AnyUrl, IPvAnyAddress
+from pydantic import BaseSettings, Field, IPvAnyAddress
 
 
 class Settings(BaseSettings):
-    """Application config.
-
-    See also:
-        - https://docs.influxdata.com/influxdb/cloud/write-data/developer-tools/api/
-        - https://docs.influxdata.com/influxdb/cloud/api/#operation/PostWrite
-    """
-
     # Configuration of access to InfluxDB Cloud.
     influxdb_url: str = Field(..., description="https://.*influxdata.com")
     influxdb_organization_id: str
@@ -25,9 +18,11 @@ class Settings(BaseSettings):
         description="The precision for the unix timestamps within the body line-protocol.",
     )
 
-    mqtt_server: Union[AnyUrl, IPvAnyAddress]
+    mqtt_host: IPvAnyAddress
+    mqtt_port: int = Field(1883, min=1, max=65535)
     mqtt_username: str
     mqtt_password: str
+    mqtt_topic_subscribe: str
 
     delay_sec: int
 
