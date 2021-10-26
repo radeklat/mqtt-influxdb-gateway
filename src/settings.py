@@ -1,7 +1,7 @@
 from functools import cache
-from typing import Literal
+from typing import Literal, Union
 
-from pydantic import BaseSettings, Field
+from pydantic import BaseSettings, Field, AnyUrl, IPvAnyAddress
 
 
 class Settings(BaseSettings):
@@ -24,6 +24,11 @@ class Settings(BaseSettings):
         default="ns",
         description="The precision for the unix timestamps within the body line-protocol.",
     )
+
+    mqtt_server: Union[AnyUrl, IPvAnyAddress]
+    mqtt_username: str
+    mqtt_password: str
+
     delay_sec: int
 
 

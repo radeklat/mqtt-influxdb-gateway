@@ -9,6 +9,7 @@ license = "MIT License"
 python = "^3.9"
 pydantic = "^1.8.2"
 influxdb-client = {extras = ["ciso"], version = "^1.22.0"}
+paho-mqtt = "^1.6.1"
 
 [tool.poetry.dev-dependencies]
 black = "^21.9b0"
