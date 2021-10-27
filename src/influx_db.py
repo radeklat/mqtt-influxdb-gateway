@@ -1,5 +1,4 @@
-from copy import deepcopy
-from typing import Dict, List, Set, Tuple, Type, Union
+from typing import Dict, Set, Type, Union
 
 from pydantic import BaseModel, Field
 
@@ -14,9 +13,8 @@ _Scalar = Union[str, int, bool, float]
 class InfluxDBLine(BaseModel):
     measurement: str
     bucket: str
-    field: str
-    value: _Scalar
-    tags: List[Tuple[str, str]] = Field(default_factory=list)
+    fields: Dict[str, _Scalar]
+    tags: Dict[str, str] = Field(default_factory=dict)
 
     _VALID_TYPES: Set[Type] = {str, int, bool, float}
     _VALID_TYPE_NAMES: Dict[str, Type] = {_.__name__: _ for _ in _VALID_TYPES}
@@ -31,8 +29,9 @@ class InfluxDBLine(BaseModel):
         return cls._VALID_TYPE_NAMES[value_type](value)
 
     @classmethod
-    def from_dict(cls, dictionary: Dict[str, Union[str, List[Tuple[str, str]]]], value: str) -> "InfluxDBLine":
-        dict_copy = deepcopy(dictionary)
-        dict_copy["value"] = cls._parse_value(dict_copy["value_type"], value)
-        dict_copy.pop("value_type")
-        return InfluxDBLine(**dict_copy)
+    def from_mqtt(
+        cls, measurement: str, bucket: str, tags: Dict[str, str], field: str, value_type: str, value: str
+    ) -> "InfluxDBLine":
+        return InfluxDBLine(
+            measurement=measurement, bucket=bucket, fields={field: cls._parse_value(value_type, value)}, tags=tags
+        )

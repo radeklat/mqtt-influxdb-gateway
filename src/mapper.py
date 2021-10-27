@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Union
 
 from influx_db import InfluxDBLine, Tag
 
@@ -25,16 +25,16 @@ class TopicToFieldsMapper:
         return pattern_parts
 
     def to_infludb_line(self, topic: str, value: str) -> InfluxDBLine:
-        output: Dict[str, Union[str, List[Tuple[str, str]]]] = {}
+        output: Dict[str, Union[str, Dict[str, str]]] = {}
 
         for pattern, part in zip(self._pattern_parts, topic.split(self._SPLIT_CHR)):
             if not pattern:
                 continue
             if isinstance(pattern, Tag):
                 if "tags" not in output:
-                    output["tags"] = []
-                output["tags"].append((pattern.name, part))
+                    output["tags"] = {}
+                output["tags"][pattern.name] = part
             else:
                 output[pattern] = part
 
-        return InfluxDBLine.from_dict(output, value)
+        return InfluxDBLine.from_mqtt(value=value, **output)
