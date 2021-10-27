@@ -1,6 +1,6 @@
 from loguru import logger
-# from influxdb_client import InfluxDBClient, Point
-# from influxdb_client.client.write_api import SYNCHRONOUS
+from influxdb_client import InfluxDBClient, Point
+from influxdb_client.client.write_api import SYNCHRONOUS
 from paho.mqtt.client import Client as MQTTClient, MQTTMessage
 from pydantic import BaseModel
 
@@ -39,27 +39,27 @@ def main() -> None:
         topic_to_fields=TopicToFieldsMapper(settings.mqtt_topic_pattern),
     )
 
-    client = MQTTClient(client_id=None)
-    client.username_pw_set(username=settings.mqtt_username, password=settings.mqtt_password)
-    client.user_data_set(user_data)
+    mqtt_client = MQTTClient(client_id=None)
+    mqtt_client.username_pw_set(username=settings.mqtt_username, password=settings.mqtt_password)
+    mqtt_client.user_data_set(user_data)
 
-    client.on_connect = on_connect
-    client.on_message = on_message
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = on_message
 
-    client.connect(host=str(settings.mqtt_host), port=settings.mqtt_port)
-    client.loop_forever()
+    mqtt_client.connect(host=str(settings.mqtt_host), port=settings.mqtt_port)
+    mqtt_client.loop_forever()
 
-    # client = InfluxDBClient(
-    #     url=settings.influxdb_url,
-    #     token=settings.influxdb_api_token,
-    #     org=settings.influxdb_organization_id,
-    # )
-    #
-    # write_api = client.write_api(write_options=SYNCHRONOUS)
-    #
-    # p = Point(settings.influxdb_measurement).tag("device_type", "esp8266").tag("device_id", "df_4d_87_0a_0b_49").field("temperature", 25.3)
-    #
-    # write_api.write(bucket=settings.influxdb_bucket, record=p)
+    influxdb_client = InfluxDBClient(
+        url=settings.influxdb_url,
+        token=settings.influxdb_api_token,
+        org=settings.influxdb_organization_id,
+    )
+
+    write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
+
+    p = Point(settings.influxdb_measurement).tag("device_type", "esp8266").tag("device_id", "df_4d_87_0a_0b_49").field("temperature", 25.3)
+
+    write_api.write(bucket=settings.influxdb_bucket, record=p)
 
 
 if __name__ == "__main__":

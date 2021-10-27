@@ -8,8 +8,6 @@ class Settings(BaseSettings):
     # Configuration of access to InfluxDB Cloud.
     influxdb_url: str = Field(..., description="https://.*influxdata.com")
     influxdb_organization_id: str
-    influxdb_bucket: str
-    influxdb_measurement: str
     influxdb_api_token: str = Field(
         ..., description="Must be writable into given `influxdb_bucket`."
     )
