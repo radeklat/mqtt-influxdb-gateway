@@ -1,4 +1,4 @@
-from typing import Dict, Set, Type, Union
+from typing import Dict, Set, Tuple, Type, Union
 
 from pydantic import BaseModel, Field
 
@@ -8,6 +8,10 @@ class Tag(BaseModel):
 
 
 _Scalar = Union[str, int, bool, float]
+
+
+class MergeConflict(Exception):
+    pass
 
 
 class InfluxDBLine(BaseModel):
@@ -35,3 +39,21 @@ class InfluxDBLine(BaseModel):
         return InfluxDBLine(
             measurement=measurement, bucket=bucket, fields={field: cls._parse_value(value_type, value)}, tags=tags
         )
+
+    @property
+    def merge_id(self) -> str:
+        return f"{self.measurement}/{self.bucket}/{self.tags}"
+
+    def merge(self, other: "InfluxDBLine") -> "InfluxDBLine":
+        if not isinstance(other, InfluxDBLine):
+            raise TypeError(f"Can only merge instances of '{self.__class__.__name__}' but '{other.__class__}' used.")
+        if self.merge_id != other.merge_id:
+            raise ValueError("Only instances with identical `merge_id` can be merged.")
+        if set(self.fields.keys()).intersection(other.fields.keys()):
+            raise MergeConflict("Instances have overlapping fields.")
+
+        model_copy = self.copy(deep=True)
+        model_copy.fields.update(other.fields)
+
+        return model_copy
+

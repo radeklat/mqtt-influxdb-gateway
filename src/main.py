@@ -1,15 +1,19 @@
+from typing import Dict
+
 from loguru import logger
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 from paho.mqtt.client import Client as MQTTClient, MQTTMessage
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from influx_db import InfluxDBLine, MergeConflict
 from mapper import TopicToFieldsMapper
 from settings import get_settings
 
 
 class UserData(BaseModel):
     topic_to_fields: TopicToFieldsMapper
+    data_aggregator: Dict[str, InfluxDBLine] = Field(default_factory=dict)
 
     class Config:
         arbitrary_types_allowed = True
@@ -29,7 +33,16 @@ def on_connect(client: MQTTClient, userdata: UserData, flags, rc: int) -> None:
 def on_message(client: MQTTClient, userdata: UserData, message: MQTTMessage) -> None:
     """The callback for when a PUBLISH message is received from the server."""
     del client
-    print(str(userdata.topic_to_fields.to_infludb_line(message.topic, message.payload)))
+    line = userdata.topic_to_fields.to_infludb_line(message.topic, message.payload)
+    merge_id = line.merge_id
+
+    try:
+        userdata.data_aggregator[merge_id] = userdata.data_aggregator[merge_id].merge(line)
+    except KeyError:
+        userdata.data_aggregator[merge_id] = line
+    except MergeConflict:
+        print(str(userdata.data_aggregator.pop(merge_id)))
+        userdata.data_aggregator[merge_id] = line
 
 
 def main() -> None:
