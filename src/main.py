@@ -1,76 +1,11 @@
-from typing import Any, Dict, List, Tuple, Type, Union
-
 from loguru import logger
 # from influxdb_client import InfluxDBClient, Point
 # from influxdb_client.client.write_api import SYNCHRONOUS
 from paho.mqtt.client import Client as MQTTClient, MQTTMessage
-from pydantic import BaseModel, Field, validator, PrivateAttr
+from pydantic import BaseModel
 
+from mapper import TopicToFieldsMapper
 from settings import get_settings
-
-
-class Tag(BaseModel):
-    name: str
-
-
-class Fields(BaseModel):
-    measurement: str
-    bucket: str
-    field: str
-    value_type: Type
-    tags: List[Tuple[str, str]] = Field(default_factory=list)
-
-    _VALID_TYPES: Dict[str, Type] = {
-        "str": str,
-        "int": int,
-        "bool": bool,
-        "float": float,
-    }
-
-    @validator("value_type", pre=True)
-    def _transform_type(cls, value: str, field: Field) -> Type:
-        if value not in cls._VALID_TYPES:
-            raise ValueError(
-                f"'{value}' is not a valid value for '{field.name}'. Allowed values are: {cls._VALID_TYPES.keys()}."
-            )
-        return cls._VALID_TYPES[value]
-
-
-class TopicToFieldsMapper:
-    _SPLIT_CHR = "/"
-
-    def __init__(self, topic_pattern: str):
-        self._pattern_parts = self._parse_patten(topic_pattern)
-
-    def _parse_patten(self, topic_pattern: str) -> List[Union[str, Tag, None]]:
-        pattern_parts: List[Union[str, Tag, None]] = []
-
-        for part in topic_pattern.split(self._SPLIT_CHR):
-            if not part or part[0] != "{" or part[-1] != "}":
-                pattern_parts.append(None)
-                continue  # skip non-patterns
-            part = part[1:-1]  # strip brackets
-            if part.startswith("tag:"):
-                pattern_parts.append(Tag(name=part[4:]))
-            else:
-                pattern_parts.append(part)
-
-        return pattern_parts
-
-    def to_dict(self, topic: str) -> Fields:
-        output: Dict[str, Union[str, List[Tuple[str, str]]]] = {}
-
-        for pattern, part in zip(self._pattern_parts, topic.split(self._SPLIT_CHR)):
-            if not pattern:
-                continue
-            if isinstance(pattern, Tag):
-                if "tags" not in output:
-                    output["tags"] = []
-                output["tags"].append((pattern.name, part))
-            else:
-                output[pattern] = part
-
-        return Fields(**output)
 
 
 class UserData(BaseModel):
@@ -94,7 +29,7 @@ def on_connect(client: MQTTClient, userdata: UserData, flags, rc: int) -> None:
 def on_message(client: MQTTClient, userdata: UserData, message: MQTTMessage) -> None:
     """The callback for when a PUBLISH message is received from the server."""
     del client
-    print(f"{userdata.topic_to_fields.to_dict(message.topic)} {message.payload}")
+    print(str(userdata.topic_to_fields.to_infludb_line(message.topic, message.payload)))
 
 
 def main() -> None:
