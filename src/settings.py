@@ -1,5 +1,5 @@
 from functools import cache
-from typing import Literal, Union
+from typing import Literal
 
 from pydantic import BaseSettings, Field, IPvAnyAddress
 
@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     mqtt_username: str
     mqtt_password: str
     mqtt_topic_subscribe: str
+    mqtt_topic_pattern: str
 
     delay_sec: int
 
