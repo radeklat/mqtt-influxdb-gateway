@@ -33,40 +33,40 @@ jobs: # A basic unit of work in a run
       - run:
           name: Install dev libraries
           command: pip install --upgrade pip poetry && poetry install --no-ansi
-#      - run:
-#          name: Format check
-#          command: poetry run inv format --check
-#      - run:
-#          name: Type check
-#          command: poetry run inv typecheck
-#      - run:
-#          name: Linters
-#          command: poetry run inv lint
+      - run:
+          name: Format check
+          command: poetry run inv format --check
+      - run:
+          name: Type check
+          command: poetry run inv typecheck
+      - run:
+          name: Linters
+          command: poetry run inv lint
       - save_cache:
           key: << pipeline.parameters.cache_version >>-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
           paths:
             - ".venv"
             - "/usr/local/bin"
             - "/usr/local/lib/python<< pipeline.parameters.python_version >>/site-packages"
-#      - run:
-#          name: Unit tests
-#          command: poetry run inv test-unit
-#      - run:
-#          name: Integration tests
-#          command: poetry run inv test-integration
-#      - run:
-#          name: Build coverage report
-#          command: poetry run inv coverage-report
+      - run:
+          name: Unit tests
+          command: poetry run inv test-unit
+      - run:
+          name: Integration tests
+          command: poetry run inv test-integration
+      - run:
+          name: Build coverage report
+          command: poetry run inv coverage-report
 #      - run:
 #          name: Upload coverage reports to Codecov
 #          command: |
 #            [[ "${CIRCLE_BRANCH}" == "master" ]] && BASE_COMMIT_SHA=$(git rev-parse HEAD~1) || BASE_COMMIT_SHA=$(git merge-base ${CIRCLE_BRANCH} origin/master)
 #            bash <(curl -s https://codecov.io/bash) -N ${BASE_COMMIT_SHA} -f reports/coverage-unit.xml -F total,unit_tests &&
 #            bash <(curl -s https://codecov.io/bash) -N ${BASE_COMMIT_SHA} -f reports/coverage-integration.xml -F total,integration_tests
-#      - store_artifacts:
-#          path: reports/coverage-report
-#      - store_test_results:
-#          path: reports
+      - store_artifacts:
+          path: reports/coverage-report
+      - store_test_results:
+          path: reports
   build_and_push:
     machine:
       image: ubuntu-2004:202107-02

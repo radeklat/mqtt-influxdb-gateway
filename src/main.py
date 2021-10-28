@@ -4,7 +4,8 @@ from typing import Dict
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import ASYNCHRONOUS
 from loguru import logger
-from paho.mqtt.client import Client as MQTTClient, MQTTMessage
+from paho.mqtt.client import Client as MQTTClient
+from paho.mqtt.client import MQTTMessage
 from pydantic import BaseModel, Field
 
 from constants import LOGGING_FORMAT
@@ -22,14 +23,14 @@ class UserData(BaseModel):
         arbitrary_types_allowed = True
 
 
-def on_connect(client: MQTTClient, userdata: UserData, flags, rc: int) -> None:
+def on_connect(client: MQTTClient, userdata: UserData, flags, result_code: int) -> None:
     """The callback for when the client receives a CONNACK response from the server.
 
     Subscribing in on_connect() means that if we lose the connection and
     reconnect then subscriptions will be renewed.
     """
     del userdata, flags
-    logger.info(f"Connected with result code {rc}.")
+    logger.info(f"Connected with result code {result_code}.")
     client.subscribe(get_settings().mqtt_topic_subscribe)
 
 
@@ -79,7 +80,11 @@ def main() -> None:
     mqtt_client.on_message = on_message
 
     mqtt_client.connect(host=str(settings.mqtt_host), port=settings.mqtt_port)
-    mqtt_client.loop_forever()
+
+    try:
+        mqtt_client.loop_forever()
+    except KeyboardInterrupt:
+        logger.info("Exiting.")
 
 
 if __name__ == "__main__":

@@ -12,9 +12,7 @@ class Settings(BaseSettings):
     # Configuration of access to InfluxDB Cloud.
     influxdb_url: str = Field(..., description="https://.*influxdata.com")
     influxdb_organization_id: str
-    influxdb_api_token: str = Field(
-        ..., description="Must be writable into given `influxdb_bucket`."
-    )
+    influxdb_api_token: str = Field(..., description="Must be writable into given `influxdb_bucket`.")
     influxdb_precision: Literal["s", "ms", "ns", "us"] = Field(
         default="ns",
         description="The precision for the unix timestamps within the body line-protocol.",
@@ -28,10 +26,11 @@ class Settings(BaseSettings):
     mqtt_topic_pattern: str
 
     @validator("log_level")
-    def valid_log_level(cls, value, field):
+    def valid_log_level(cls, value, field):  # pylint: disable=no-self-argument, no-self-use
         if value not in LOG_LEVELS:
             raise ValueError(f"'{value}' is not allowed as a value for '{field}'. Allowed values are: {LOG_LEVELS}.")
         return value
+
 
 @cache
 def get_settings() -> Settings:

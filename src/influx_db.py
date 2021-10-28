@@ -36,10 +36,19 @@ class InfluxDBLine(BaseModel):
 
     @classmethod
     def from_mqtt(
-        cls, measurement: str, bucket: str, tags: Dict[str, str], field: str, value_type: str, value: str
+        cls,
+        measurement: str,
+        bucket: str,
+        tags: Dict[str, str],
+        field: str,
+        value_type: str,
+        value: str,
     ) -> "InfluxDBLine":
         return InfluxDBLine(
-            measurement=measurement, bucket=bucket, fields={field: cls._parse_value(value_type, value)}, tags=tags
+            measurement=measurement,
+            bucket=bucket,
+            fields={field: cls._parse_value(value_type, value)},
+            tags=tags,
         )
 
     @property
@@ -58,4 +67,3 @@ class InfluxDBLine(BaseModel):
         model_copy.fields.update(other.fields)
 
         return model_copy
-
