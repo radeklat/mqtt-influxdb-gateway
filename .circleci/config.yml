@@ -12,7 +12,7 @@ parameters:
     default: "3.9"
   cache_version:
     type: string
-    default: "1"
+    default: "2"
   dockerhub_username:
     type: string
     default: "radeklat"
@@ -32,7 +32,7 @@ jobs: # A basic unit of work in a run
           key: << pipeline.parameters.cache_version >>-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
       - run:
           name: Install dev libraries
-          command: pip install --upgrade pip poetry && poetry install
+          command: pip install --upgrade pip poetry && poetry install --no-ansi
 #      - run:
 #          name: Format check
 #          command: poetry run inv format --check
@@ -116,4 +116,4 @@ workflows:
             - Tests
           filters:
             branches:
-              only: master
+              only: main
