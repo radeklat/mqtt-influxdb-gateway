@@ -373,6 +373,7 @@ Dockerfile
 README.md
 .gitignore
 .git
+poetry.toml
 
 ## Check list of included files with:
 #docker image build -t build-context -f - . <<EOF
