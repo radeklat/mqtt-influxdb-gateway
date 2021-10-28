@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Any, Dict, Set, Type, Union
 
 from pydantic import BaseModel, Field
@@ -19,6 +20,7 @@ class InfluxDBLine(BaseModel):
     bucket: str
     fields: Dict[str, Any]
     tags: Dict[str, str] = Field(default_factory=dict)
+    time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     _VALID_TYPES: Set[Type] = {str, int, bool, float}
     _VALID_TYPE_NAMES: Dict[str, Type] = {_.__name__: _ for _ in _VALID_TYPES}
