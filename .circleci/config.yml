@@ -99,7 +99,7 @@ jobs: # A basic unit of work in a run
           command: docker login --username << pipeline.parameters.dockerhub_username >> --password $DOCKERHUB_PERSONAL_ACCESS_TOKEN
       - run:
           name: Push docker image
-          command: docker push << pipeline.parameters.dockerhub_username >>/<< pipeline.parameters.project_name >>
+          command: docker push --all-tags << pipeline.parameters.dockerhub_username >>/<< pipeline.parameters.project_name >>
 
 workflows:
   version: 2
