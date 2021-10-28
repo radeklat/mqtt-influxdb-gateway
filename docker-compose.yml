@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  mqtt-influxdb-gateway:
+    image: "radeklat/mqtt-influxdb-gateway:latest"
+    container_name: mqtt-influxdb-gateway
+    env_file:
+      - .env
+    restart: always

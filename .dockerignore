@@ -374,6 +374,7 @@ README.md
 .gitignore
 .git
 poetry.toml
+docker-compose.yml
 
 ## Check list of included files with:
 #docker image build -t build-context -f - . <<EOF
