@@ -1,17 +1,20 @@
+import sys
 from typing import Dict
 
+from influxdb_client import InfluxDBClient
+from influxdb_client.client.write_api import ASYNCHRONOUS
 from loguru import logger
-from influxdb_client import InfluxDBClient, Point
-from influxdb_client.client.write_api import SYNCHRONOUS
 from paho.mqtt.client import Client as MQTTClient, MQTTMessage
 from pydantic import BaseModel, Field
 
+from constants import LOGGING_FORMAT
 from influx_db import InfluxDBLine, MergeConflict
 from mapper import TopicToFieldsMapper
 from settings import get_settings
 
 
 class UserData(BaseModel):
+    influxdb_client: InfluxDBClient
     topic_to_fields: TopicToFieldsMapper
     data_aggregator: Dict[str, InfluxDBLine] = Field(default_factory=dict)
 
@@ -36,20 +39,36 @@ def on_message(client: MQTTClient, userdata: UserData, message: MQTTMessage) -> 
     line = userdata.topic_to_fields.to_infludb_line(message.topic, message.payload)
     merge_id = line.merge_id
 
+    logger.debug("Single measurement received.", line=line)
+
     try:
         userdata.data_aggregator[merge_id] = userdata.data_aggregator[merge_id].merge(line)
     except KeyError:
         userdata.data_aggregator[merge_id] = line
     except MergeConflict:
-        print(str(userdata.data_aggregator.pop(merge_id)))
+        write_to_influxdb(userdata.influxdb_client, userdata.data_aggregator.pop(merge_id))
         userdata.data_aggregator[merge_id] = line
+
+
+def write_to_influxdb(client: InfluxDBClient, data: InfluxDBLine) -> None:
+    with client.write_api(write_options=ASYNCHRONOUS) as write_api:
+        write_api.write(bucket=data.bucket, record=data.dict())
+    logger.debug("Data sent to InfluxDB", data=data)
 
 
 def main() -> None:
     settings = get_settings()
 
+    logger.configure(handlers=[])  # removes all pre-existing handlers
+    logger.add(sys.stdout, format=LOGGING_FORMAT, level=settings.log_level, backtrace=True)
+
     user_data = UserData(
         topic_to_fields=TopicToFieldsMapper(settings.mqtt_topic_pattern),
+        influxdb_client=InfluxDBClient(
+            url=settings.influxdb_url,
+            token=settings.influxdb_api_token,
+            org=settings.influxdb_organization_id,
+        ),
     )
 
     mqtt_client = MQTTClient(client_id=None)
@@ -61,18 +80,6 @@ def main() -> None:
 
     mqtt_client.connect(host=str(settings.mqtt_host), port=settings.mqtt_port)
     mqtt_client.loop_forever()
-
-    influxdb_client = InfluxDBClient(
-        url=settings.influxdb_url,
-        token=settings.influxdb_api_token,
-        org=settings.influxdb_organization_id,
-    )
-
-    write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
-
-    p = Point(settings.influxdb_measurement).tag("device_type", "esp8266").tag("device_id", "df_4d_87_0a_0b_49").field("temperature", 25.3)
-
-    write_api.write(bucket=settings.influxdb_bucket, record=p)
 
 
 if __name__ == "__main__":

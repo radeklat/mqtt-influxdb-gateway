@@ -1,4 +1,4 @@
-from typing import Dict, Set, Tuple, Type, Union
+from typing import Any, Dict, Set, Type, Union
 
 from pydantic import BaseModel, Field
 
@@ -17,7 +17,7 @@ class MergeConflict(Exception):
 class InfluxDBLine(BaseModel):
     measurement: str
     bucket: str
-    fields: Dict[str, _Scalar]
+    fields: Dict[str, Any]
     tags: Dict[str, str] = Field(default_factory=dict)
 
     _VALID_TYPES: Set[Type] = {str, int, bool, float}
