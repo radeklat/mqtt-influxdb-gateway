@@ -2,23 +2,18 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY pyproject.toml ./
-COPY poetry.lock* ./
+RUN apt-get --allow-releaseinfo-change update
+RUN apt-get install gcc g++ libssl-dev libffi-dev rustc -y
+RUN python -m pip install --upgrade pip
+RUN pip install poetry
 
-ENV POETRY_VIRTUALENVS_CREATE=false
+COPY pyproject.toml poetry.lock ./
 
-RUN apt-get --allow-releaseinfo-change update && \
-    apt-get install gcc g++ -y && \
-    pip install -U pip && \
-    pip install poetry && \
-    poetry install --no-dev --no-root && \
-    apt-get remove gcc g++ -y && \
-    apt-get autoremove -y && \
-    apt-get clean
+RUN poetry install --no-dev --no-root
 
 # PYTHONPATH set after install to prevent bugs
 ENV PYTHONPATH="src"
 
 COPY . .
 
-ENTRYPOINT python src/main.py
+ENTRYPOINT poetry run python src/main.py

@@ -6,3 +6,5 @@ services:
     env_file:
       - .env
     restart: always
+    security_opt:  # See https://community.home-assistant.io/t/migration-to-2021-7-fails-fatal-python-error-init-interp-main-cant-initialize-time/320648/20
+      - seccomp:unconfined

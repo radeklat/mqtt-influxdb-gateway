@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "mqtt_influxdb_gateway"
-version = "0.1.0"
+name = "mqtt-influxdb-gateway"
+version = "0.1.1"
 description = "An MQTT gateway sending data to InfluxDB"
 authors = ["Radek Lát <radek.lat@gmail.com>"]
 license = "MIT License"
@@ -27,6 +27,8 @@ pydocstyle = "^6.1.1"
 pytest-dotenv = "^0.5.2"
 invoke = "^1.6.0"
 types-termcolor = "*"
+toml = "^0.10.2"
+types-toml = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -107,3 +109,6 @@ add-ignore = [
     "D401",  # "First line should be in imperative mood"
     "D413",  # "Missing blank line after last section"
 ]
+
+[tool.invoke.dockerhub]
+username = "radeklat"

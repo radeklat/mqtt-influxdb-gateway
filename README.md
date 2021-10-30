@@ -161,6 +161,16 @@ If you used the `latest` tag, run `docker-compose pull mqtt-influxdb-gateway`.
 
 # Development
 
+## Building for ARMv7
+
+At the moment, build for ARMv7 takes about 15-20 minutes. This is caused by the cryptography package switching to Rust compiler (some info [here](https://github.com/matrix-org/synapse/issues/9403)). The build process is significantly slower and not suitable for running in the free tier CircleCI build pipeline.
+
+To build and push the image manually, run:
+
+```shell script
+inv docker-build
+```
+
 ## Paho documentation
 
 https://github.com/eclipse/paho.mqtt.python#contents
@@ -169,3 +179,7 @@ https://github.com/eclipse/paho.mqtt.python#contents
 
 - https://docs.influxdata.com/influxdb/cloud/write-data/developer-tools/api/
 - https://docs.influxdata.com/influxdb/cloud/api/#operation/PostWrite
+
+# TODOs
+
+- Multi-stage docker build (356.17 MB -> 125.53 MB)
