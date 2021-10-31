@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   mqtt-influxdb-gateway:
-    image: "radeklat/mqtt-influxdb-gateway:latest"
+    image: "mqtt-influxdb-gateway:local"
     container_name: mqtt-influxdb-gateway
     env_file:
       - .env

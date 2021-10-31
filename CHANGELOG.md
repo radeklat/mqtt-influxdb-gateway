@@ -14,6 +14,12 @@ Types of changes are:
 
 ## [Unreleased]
 
+## [0.1.2] - 2011-10-31
+
+### Changed
+
+- Change `Dockerfile` to use Python version from `pyproject.toml`.
+
 ## [0.1.1] - 2011-10-30
 
 ### Changed
@@ -27,6 +33,7 @@ Types of changes are:
 
 - Initial release
 
-[Unreleased]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/0.1.1...HEAD
-[0.1.1]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/initial...0.1.0
+[Unreleased]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/0.1.2...HEAD
+[0.1.2]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/0.1.1...0.1.2
+[0.1.1]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/initial...0.1.0

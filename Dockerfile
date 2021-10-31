@@ -1,4 +1,5 @@
-FROM python:3.9-slim
+ARG PYTHON_VERSION
+FROM python:${PYTHON_VERSION}-slim
 
 WORKDIR /app
 
@@ -16,4 +17,4 @@ ENV PYTHONPATH="src"
 
 COPY . .
 
-ENTRYPOINT poetry run python src/main.py
+ENTRYPOINT ["poetry", "run", "python", "src/main.py"]

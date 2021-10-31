@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mqtt-influxdb-gateway"
-version = "0.1.1"
+version = "0.1.2"
 description = "An MQTT gateway sending data to InfluxDB"
 authors = ["Radek Lát <radek.lat@gmail.com>"]
 license = "MIT License"
@@ -29,6 +29,7 @@ invoke = "^1.6.0"
 types-termcolor = "*"
 toml = "^0.10.2"
 types-toml = "*"
+packaging = "^21.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -112,3 +113,8 @@ add-ignore = [
 
 [tool.invoke.dockerhub]
 username = "radeklat"
+build_for_platforms = [
+    "linux/amd64",
+    "linux/arm64",
+    "linux/arm/v7",
+]
