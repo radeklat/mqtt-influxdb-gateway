@@ -84,53 +84,53 @@ jobs: # A basic unit of work in a run
             export DOCKER_CLI_EXPERIMENTAL=enabled
             IMAGE_VERSION="$(poetry version -s)"
             tag_exists="$(docker manifest inspect << pipeline.parameters.dockerhub_username >>/<< pipeline.parameters.project_name >>:$IMAGE_VERSION >/dev/null 2>&1; echo $?)"
-#            if [[ $tag_exists -eq 0 ]]; then
-#              echo "Image tag '$IMAGE_VERSION' already exists in the repository. Skipping job."
-#              circleci-agent step halt
-#            else
-#              echo "Image tag '$IMAGE_VERSION' doesn't exist in the repository. Running build."
-#            fi
+            if [[ $tag_exists -eq 0 ]]; then
+              echo "Image tag '$IMAGE_VERSION' already exists in the repository. Skipping job."
+              circleci-agent step halt
+            else
+              echo "Image tag '$IMAGE_VERSION' doesn't exist in the repository. Running build."
+            fi
       - restore_cache:
           key: << pipeline.parameters.cache_version >>-docker-build-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
-#      - run:
-#          name: Install dev libraries
-#          command: poetry install --no-ansi
-#      - save_cache:
-#          key: << pipeline.parameters.cache_version >>-docker-build-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
-#          paths:
-#            - ".venv"
-#      - run:
-#          name: Install emulators
-#          command: |
-#            docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
-#      - run:
-#          name: Create and use a new docker build driver
-#          command: |
-#            docker buildx create --use
-#      - run:
-#          name: Build and push docker image
-#          command: |
-#            poetry run inv docker-build
+      - run:
+          name: Install dev libraries
+          command: poetry install --no-ansi
+      - save_cache:
+          key: << pipeline.parameters.cache_version >>-docker-build-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
+          paths:
+            - ".venv"
+      - run:
+          name: Install emulators
+          command: |
+            docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
+      - run:
+          name: Create and use a new docker build driver
+          command: |
+            docker buildx create --use
+      - run:
+          name: Build and push docker image
+          command: |
+            poetry run inv docker-build
       - gh/setup
       - run:
           name: Tag release
           command: |
-            gh release create $IMAGE_VERSION -F CHANGELOG.md
+            gh release create $(poetry version -s) -F CHANGELOG.md
 
 workflows:
   version: 2
   all_pipelines:
     jobs:
-#      - test:
-#          context: mqtt-influxdb-gateway
-#          name: Tests
+      - test:
+          context: mqtt-influxdb-gateway
+          name: Tests
       - build_and_push:
           name: Build and push docker image
           context:
             - dockerhub
             - github
-#          requires:
-#            - Tests
-#          filters:
-#            branches:
-#              only: main
+          requires:
+            - Tests
+          filters:
+            branches:
+              only: main
