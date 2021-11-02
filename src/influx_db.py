@@ -3,6 +3,8 @@ from typing import Any, Dict, Set, Type, Union
 
 from pydantic import BaseModel, Field
 
+from utils import FieldAccessMeta
+
 
 class Tag(BaseModel):
     name: str
@@ -15,7 +17,7 @@ class MergeConflict(Exception):
     pass
 
 
-class InfluxDBLine(BaseModel):
+class InfluxDBLine(BaseModel, metaclass=FieldAccessMeta):
     measurement: str
     bucket: str
     fields: Dict[str, Any]
@@ -30,7 +32,7 @@ class InfluxDBLine(BaseModel):
         if value_type not in cls._VALID_TYPE_NAMES:
             raise ValueError(
                 f"'{value_type}' is not a valid value for 'value_type'. "
-                f"Allowed values are: {cls._VALID_TYPE_NAMES.keys()}."
+                f"Allowed values are: {list(cls._VALID_TYPE_NAMES.keys())}."
             )
         return cls._VALID_TYPE_NAMES[value_type](value)
 
@@ -41,8 +43,8 @@ class InfluxDBLine(BaseModel):
         bucket: str,
         tags: Dict[str, str],
         field: str,
-        value_type: str,
         value: str,
+        value_type: str = "str",
     ) -> "InfluxDBLine":
         return InfluxDBLine(
             measurement=measurement,

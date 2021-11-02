@@ -37,7 +37,7 @@ def on_connect(client: MQTTClient, userdata: UserData, flags, result_code: int) 
 def on_message(client: MQTTClient, userdata: UserData, message: MQTTMessage) -> None:
     """The callback for when a PUBLISH message is received from the server."""
     del client
-    line = userdata.topic_to_fields.to_infludb_line(message.topic, message.payload)
+    line = userdata.topic_to_fields.to_influxdb_line(message.topic, message.payload)
     merge_id = line.merge_id
 
     logger.debug("Single measurement received.", line=line)
@@ -64,7 +64,9 @@ def main() -> None:
     logger.add(sys.stdout, format=LOGGING_FORMAT, level=settings.log_level, backtrace=True)
 
     user_data = UserData(
-        topic_to_fields=TopicToFieldsMapper(settings.mqtt_topic_pattern),
+        topic_to_fields=TopicToFieldsMapper(
+            settings.mqtt_topic_pattern, settings.influxdb_default_bucket, settings.influxdb_default_measurement
+        ),
         influxdb_client=InfluxDBClient(
             url=settings.influxdb_url,
             token=settings.influxdb_api_token,
