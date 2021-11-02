@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mqtt-influxdb-gateway"
-version = "0.1.2"
+version = "0.2.0"
 description = "An MQTT gateway sending data to InfluxDB"
 authors = ["Radek Lát <radek.lat@gmail.com>"]
 license = "MIT License"

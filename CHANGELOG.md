@@ -14,6 +14,8 @@ Types of changes are:
 
 ## [Unreleased]
 
+## [0.2.0] - 2011-11-02
+
 ### Added
 
 - Option to define when to merge data points (`mqtt_merge_data_points_on`).
@@ -41,7 +43,8 @@ Types of changes are:
 
 - Initial release
 
-[Unreleased]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/0.1.2...HEAD
+[Unreleased]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/0.1.2...0.2.0
 [0.1.2]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/radeklat/mqtt_influxdb_gateway/compare/initial...0.1.0
