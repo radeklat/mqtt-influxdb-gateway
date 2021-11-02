@@ -63,6 +63,8 @@ def main() -> None:
     logger.configure(handlers=[])  # removes all pre-existing handlers
     logger.add(sys.stdout, format=LOGGING_FORMAT, level=settings.log_level, backtrace=True)
 
+    InfluxDBLine.merge_data_points_on(settings.mqtt_merge_data_points_on)
+
     user_data = UserData(
         topic_to_fields=TopicToFieldsMapper(
             settings.mqtt_topic_pattern, settings.influxdb_default_bucket, settings.influxdb_default_measurement

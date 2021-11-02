@@ -14,6 +14,14 @@ Types of changes are:
 
 ## [Unreleased]
 
+### Added
+
+- Option to define when to merge data points (`mqtt_merge_data_points_on`).
+- Validation of variables in `mqtt_topic_pattern`.
+- Validation of `influxdb_url`
+- Options to set global bucket and measurement with `influxdb_default_bucket` and `influxdb_default_measurement`.
+- Documentation of settings.
+
 ## [0.1.2] - 2011-10-31
 
 ### Changed

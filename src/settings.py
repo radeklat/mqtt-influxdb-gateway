@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     # Configuration of access to InfluxDB Cloud.
     influxdb_url: str = Field(
-        ..., description="URL of your InfluxDB Cloud instance.", regex="https://.*\.influxdata.com"
+        ..., description="URL of your InfluxDB Cloud instance.", regex=r"https://.*\.influxdata.com"
     )
     influxdb_organization_id: str = Field(
         ...,
@@ -62,6 +62,22 @@ class Settings(BaseSettings):
         "   'tags': {'device_id': 'esp8266'}, "
         "   'fields': {'temperature': 23.412}"
         "}`",
+    )
+    mqtt_merge_data_points_on: str = Field(
+        default="{measurement}{bucket}{tags}",
+        description="It is expected there will be a single value in each topic. But "
+        "InfluxDB allows multiple fields to be sent at once (for example from one device). "
+        "Use this option to define criteria on which to merge data points. The order and "
+        "any extra characters aside from variables below are irrelevant. All collected fields"
+        "are then sent to InfluxDB when any of the fields is seen more than once (suggesting "
+        "new data is coming in)."
+        ""
+        "Possible values are:"
+        "- `{bucket}`"
+        "- `{measurement}`"
+        "- `{tags}` for all tags and their values"
+        "- `{tags[NAME]}` for a value of single tag named `NAME`",
+        example="A value of `{tags[device_id]}` will merge all received data that share " "the same `device_id` tag.",
     )
 
     @validator("log_level")
