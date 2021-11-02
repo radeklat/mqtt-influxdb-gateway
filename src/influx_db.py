@@ -1,7 +1,9 @@
 from datetime import datetime, timezone
-from typing import Any, Dict, Set, Type, Union
+from typing import Any, ClassVar, Dict, Set, Type, Union
 
 from pydantic import BaseModel, Field
+
+from utils import FieldAccessMeta
 
 
 class Tag(BaseModel):
@@ -15,7 +17,7 @@ class MergeConflict(Exception):
     pass
 
 
-class InfluxDBLine(BaseModel):
+class InfluxDBLine(BaseModel, metaclass=FieldAccessMeta):
     measurement: str
     bucket: str
     fields: Dict[str, Any]
@@ -25,12 +27,14 @@ class InfluxDBLine(BaseModel):
     _VALID_TYPES: Set[Type] = {str, int, bool, float}
     _VALID_TYPE_NAMES: Dict[str, Type] = {_.__name__: _ for _ in _VALID_TYPES}
 
+    _merge_on: ClassVar[str] = ""
+
     @classmethod
     def _parse_value(cls, value_type: str, value: str) -> _Scalar:
         if value_type not in cls._VALID_TYPE_NAMES:
             raise ValueError(
                 f"'{value_type}' is not a valid value for 'value_type'. "
-                f"Allowed values are: {cls._VALID_TYPE_NAMES.keys()}."
+                f"Allowed values are: {list(cls._VALID_TYPE_NAMES.keys())}."
             )
         return cls._VALID_TYPE_NAMES[value_type](value)
 
@@ -41,8 +45,8 @@ class InfluxDBLine(BaseModel):
         bucket: str,
         tags: Dict[str, str],
         field: str,
-        value_type: str,
         value: str,
+        value_type: str = "str",
     ) -> "InfluxDBLine":
         return InfluxDBLine(
             measurement=measurement,
@@ -51,9 +55,14 @@ class InfluxDBLine(BaseModel):
             tags=tags,
         )
 
+    @classmethod
+    def merge_data_points_on(cls, new_pattern: str) -> None:
+        """Merge instances with identical string formatted using ``self.__dict__.`."""
+        cls._merge_on = new_pattern
+
     @property
     def merge_id(self) -> str:
-        return f"{self.measurement}/{self.bucket}/{self.tags}"
+        return self._merge_on.format(**self.__dict__)
 
     def merge(self, other: "InfluxDBLine") -> "InfluxDBLine":
         if not isinstance(other, InfluxDBLine):

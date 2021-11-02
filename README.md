@@ -182,4 +182,5 @@ https://github.com/eclipse/paho.mqtt.python#contents
 
 # TODOs
 
-- Multi-stage docker build (356.17 MB -> 125.53 MB)
+- Define what to merge data points on.
+- Export settings names descriptions and examples into documentation?
