@@ -77,7 +77,7 @@ jobs: # A basic unit of work in a run
       - checkout
       - run:
           name: Install dev libraries
-          command: pip3 install --upgrade pip poetry
+          command: pip3 install poetry
       - run:
           name: Check if build needed
           command: |
@@ -107,6 +107,16 @@ jobs: # A basic unit of work in a run
           name: Build and push docker image
           command: |
             poetry run inv docker-build
+  release:
+    working_directory: << pipeline.parameters.working_directory >>
+    docker:
+      - image: circleci/python:<< pipeline.parameters.python_version >>
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python<< pipeline.parameters.python_version >>/site-packages
+      - restore_cache:
+          key: << pipeline.parameters.cache_version >>-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
       - gh/setup
       - run:
           name: Tag release
@@ -124,9 +134,16 @@ workflows:
           name: Build and push docker image
           context:
             - dockerhub
-            - github
           requires:
             - Tests
+          filters:
+            branches:
+              only: main
+      - release:
+          context:
+            - github
+          requires:
+            - Build and push docker image
           filters:
             branches:
               only: main

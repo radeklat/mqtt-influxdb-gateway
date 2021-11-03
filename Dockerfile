@@ -3,8 +3,9 @@ FROM python:${PYTHON_VERSION}-slim
 
 WORKDIR /app
 
-RUN apt-get --allow-releaseinfo-change update
-RUN apt-get install gcc g++ libssl-dev libffi-dev rustc -y
+RUN apt-get --allow-releaseinfo-change update && \
+    apt-get install gcc g++ libssl-dev libffi-dev rustc -y && \
+    rm -rf /var/lib/apt/*
 RUN python -m pip install --upgrade pip
 RUN pip install poetry
 
