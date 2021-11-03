@@ -18,9 +18,22 @@ except ImportError:
     print("This script depends on `packaging`. Run `poetry add -D packaging`.")
     raise
 
-from invoke import task
+from invoke import Context, task
 
 from tasks.utils import print_header
+
+
+def install_emulators(ctx: Context, build_for_platforms: List[str]) -> None:
+    """See https://github.com/tonistiigi/binfmt#installing-emulators."""
+    emulators = []
+    if "linux/arm64" in build_for_platforms:
+        emulators.append("arm64")
+    if "linux/arm/v7" in build_for_platforms:
+        emulators.append("arm")
+
+    if emulators:
+        print_header("Installing emulators", level=2, icon="⬇")
+        ctx.run("docker run --privileged --rm tonistiigi/binfmt --install " + ",".join(emulators))
 
 
 @task()
@@ -48,7 +61,8 @@ def docker_build(ctx, push=True):
 
     dockerhub = pyproject["tool"]["invoke"]["dockerhub"]
     dockerhub_username = dockerhub["username"]
-    flags.append("--platform " + ",".join(dockerhub["build_for_platforms"]))
+    build_for_platforms = dockerhub["build_for_platforms"]
+    flags.append("--platform " + ",".join(build_for_platforms))
 
     if push:
         dockerhub_password = getenv("DOCKERHUB_PERSONAL_ACCESS_TOKEN")
@@ -62,9 +76,13 @@ def docker_build(ctx, push=True):
     if getenv("CI"):  # https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
         flags.append("--progress plain")
 
+    install_emulators(ctx, build_for_platforms)
+
     # While `docker buildx build` supports multiple `--tag` flags, push of them fails to expose
     # all architectures in `latest`. Multiple pushes fix this.
     for tag in [project_version, "latest"]:
+        print_header(f"Build {dockerhub_username}/{project_name}:{tag}", level=2, icon="🔨")
+
         flags_for_tag = list(flags)
         if tag != "latest" and push:
             flags_for_tag.append(f"--cache-to type=registry,ref={dockerhub_username}/{project_name}")

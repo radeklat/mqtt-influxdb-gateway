@@ -100,10 +100,6 @@ jobs: # A basic unit of work in a run
           paths:
             - ".venv"
       - run:
-          name: Install emulators
-          command: |
-            docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
-      - run:
           name: Create and use a new docker build driver
           command: |
             docker buildx create --use
