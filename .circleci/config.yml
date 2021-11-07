@@ -19,14 +19,17 @@ parameters:
   dockerhub_username:
     type: string
     default: "radeklat"
+  git_trunk_branch:
+    type: string
+    default: "main"
 
 jobs: # A basic unit of work in a run
   test:
-    working_directory: << pipeline.parameters.working_directory >>
     docker:
-      - image: circleci/python:<< pipeline.parameters.python_version >>
-        environment:
-          PIPENV_VENV_IN_PROJECT: true
+    - image: circleci/python:<< pipeline.parameters.python_version >>
+    environment:
+      PIPENV_VENV_IN_PROJECT: "true"
+    working_directory: << pipeline.parameters.working_directory >>
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
@@ -60,12 +63,12 @@ jobs: # A basic unit of work in a run
       - run:
           name: Build coverage report
           command: poetry run inv coverage-report
-#      - run:
-#          name: Upload coverage reports to Codecov
-#          command: |
-#            [[ "${CIRCLE_BRANCH}" == "master" ]] && BASE_COMMIT_SHA=$(git rev-parse HEAD~1) || BASE_COMMIT_SHA=$(git merge-base ${CIRCLE_BRANCH} origin/master)
-#            bash <(curl -s https://codecov.io/bash) -N ${BASE_COMMIT_SHA} -f reports/coverage-unit.xml -F total,unit_tests &&
-#            bash <(curl -s https://codecov.io/bash) -N ${BASE_COMMIT_SHA} -f reports/coverage-integration.xml -F total,integration_tests
+      - run:
+          name: Upload coverage reports to Codecov
+          command: |
+            [[ "${CIRCLE_BRANCH}" == "<< pipeline.parameters.git_trunk_branch >>" ]] && BASE_COMMIT_SHA=$(git rev-parse HEAD~1) || BASE_COMMIT_SHA=$(git merge-base ${CIRCLE_BRANCH} origin/<< pipeline.parameters.git_trunk_branch >>)
+            bash <(curl -s https://codecov.io/bash) -N ${BASE_COMMIT_SHA} -f reports/coverage-unit.xml -F total,unit_tests &&
+            bash <(curl -s https://codecov.io/bash) -N ${BASE_COMMIT_SHA} -f reports/coverage-integration.xml -F total,integration_tests
       - store_artifacts:
           path: reports/coverage-report
       - store_test_results:
@@ -121,7 +124,14 @@ jobs: # A basic unit of work in a run
       - run:
           name: Tag release
           command: |
-            gh release create $(poetry version -s) -F CHANGELOG.md
+            git fetch --tags origin
+            VERSION=$(poetry version -s)
+            git tag | grep -q $VERSION
+            if [[ $? != 0 ]]; then
+              gh release create $VERSION -F CHANGELOG.md
+            else
+              echo "Tag `$VERSION` already exists. Skipping."
+            fi
 
 workflows:
   version: 2
@@ -138,7 +148,7 @@ workflows:
             - Tests
           filters:
             branches:
-              only: main
+              only: << pipeline.parameters.git_trunk_branch >>
       - release:
           context:
             - github
@@ -146,4 +156,4 @@ workflows:
             - Build and push docker image
           filters:
             branches:
-              only: main
+              only: << pipeline.parameters.git_trunk_branch >>

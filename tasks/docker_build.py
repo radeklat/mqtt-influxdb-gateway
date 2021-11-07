@@ -1,4 +1,3 @@
-"""Type checking on source code."""
 from getpass import getpass
 from os import getenv
 from pathlib import Path

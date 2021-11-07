@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mqtt-influxdb-gateway"
-version = "0.2.0"
+version = "0.2.1"
 description = "An MQTT gateway sending data to InfluxDB"
 authors = ["Radek Lát <radek.lat@gmail.com>"]
 license = "MIT License"
@@ -46,7 +46,7 @@ line_length = 120
 
 [tool.black]
 line-length = 120
-target-version = ['py39']
+target-version = ['py38']
 exclude = '''
 /(
     \.eggs
