@@ -127,10 +127,10 @@ jobs: # A basic unit of work in a run
             git fetch --tags origin
             VERSION=$(poetry version -s)
             git tag | grep -q $VERSION
-            if [[ $? != 0 ]]; then
+            if [[ $? -ne 0 ]]; then
               gh release create $VERSION -F CHANGELOG.md
             else
-              echo "Tag `$VERSION` already exists. Skipping."
+              echo "Tag '$VERSION' already exists. Skipping."
             fi
 
 workflows:
