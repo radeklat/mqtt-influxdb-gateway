@@ -250,10 +250,10 @@ When both a variable and a `influxdb_*` configuration option are defined, variab
 
 ```json
 {
-   'bucket': 'home',
-   'measurement': 'environment',
-   'tags': {'device_id': 'esp8266'},
-   'fields': {'temperature': 23.412}
+   "bucket": "home",
+   "measurement": "environment",
+   "tags": {"device_id": "esp8266"},
+   "fields": {"temperature": 23.412}
 }
 ```
 
