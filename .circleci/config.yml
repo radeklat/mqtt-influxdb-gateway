@@ -99,8 +99,7 @@ jobs: # A basic unit of work in a run
       - run:
           name: Check if any changes were made
           command: |
-            # Summary of changes in given files/dirs. No output if no changes found.
-            if [[ -z "$(git diff --shortstat HEAD~1..HEAD README.md)" ]]; then
+            if [[ -z "$(git status -s README.md)" ]]; then
               echo "No changes detected. Skipping."
               circleci-agent step halt
             fi
