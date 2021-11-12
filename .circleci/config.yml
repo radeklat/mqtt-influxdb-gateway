@@ -99,20 +99,8 @@ jobs: # A basic unit of work in a run
       - run:
           name: Check if any changes were made
           command: |
-            TRUNK_BRANCH="<< pipeline.parameters.git_trunk_branch >>"
-            if [[ "${CIRCLE_BRANCH}" == "$TRUNK_BRANCH" ]]
-            then
-              MAIN_REFERENCE_COMMIT_SHA=$(git rev-parse HEAD~1)
-              echo "Running on $TRUNK_BRANCH; comparing to previous $TRUNK_BRANCH commit (${MAIN_REFERENCE_COMMIT_SHA})"
-            else
-              MAIN_REFERENCE_COMMIT_SHA=$(git merge-base ${CIRCLE_BRANCH} origin/$TRUNK_BRANCH)
-              echo "Running on non-$TRUNK_BRANCH branch; comparing with last $TRUNK_BRANCH commit on branch (${MAIN_REFERENCE_COMMIT_SHA})"
-            fi
-
             # Summary of changes in given files/dirs. No output if no changes found.
-            DIFF_SUMMARY=$(git diff --shortstat ${MAIN_REFERENCE_COMMIT_SHA}..HEAD README.md)
-
-            if [[ -z "${DIFF_SUMMARY}" ]]; then
+            if [[ -z "$(git diff --shortstat HEAD~1..HEAD README.md)" ]]; then
               echo "No changes detected. Skipping."
               circleci-agent step halt
             fi

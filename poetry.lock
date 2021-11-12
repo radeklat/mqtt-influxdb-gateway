@@ -542,7 +542,7 @@ python-versions = ">=3.6.0"
 
 [[package]]
 name = "settings-doc"
-version = "0.5.0"
+version = "0.5.1"
 description = "A command line tool for generating Markdown documentation and .env files from pydantic BaseSettings."
 category = "dev"
 optional = false
@@ -1141,8 +1141,8 @@ rx = [
     {file = "Rx-3.2.0.tar.gz", hash = "sha256:b657ca2b45aa485da2f7dcfd09fac2e554f7ac51ff3c2f8f2ff962ecd963d91c"},
 ]
 settings-doc = [
-    {file = "settings-doc-0.5.0.tar.gz", hash = "sha256:61cf6f891f0aa6c90e0685293916c32ea97054f4590789bf40a4e4dcfa1515c8"},
-    {file = "settings_doc-0.5.0-py3-none-any.whl", hash = "sha256:60be9f5eace2903c233e7410b327864cf5f5ba9276a67a21934d5e830df0dac1"},
+    {file = "settings-doc-0.5.1.tar.gz", hash = "sha256:9dfcd68025198d254148887821d67f68c8851e6a33fc417e8a6c6e1e62f4ca04"},
+    {file = "settings_doc-0.5.1-py3-none-any.whl", hash = "sha256:13e442a9988bac3487401f99e740f3e5e6cae24a88cce896d362e1867cd1d3ee"},
 ]
 shellingham = [
     {file = "shellingham-1.4.0-py2.py3-none-any.whl", hash = "sha256:536b67a0697f2e4af32ab176c00a50ac2899c5a05e0d8e2dadac8e58888283f9"},
