@@ -73,6 +73,68 @@ jobs: # A basic unit of work in a run
           path: reports/coverage-report
       - store_test_results:
           path: reports
+  generate_documentation:
+    docker:
+      - image: circleci/python:<< pipeline.parameters.python_version >>
+    environment:
+      PIPENV_VENV_IN_PROJECT: "true"
+      PYTHONPATH: "src"
+    working_directory: << pipeline.parameters.working_directory >>
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python<< pipeline.parameters.python_version >>/site-packages
+      - restore_cache:
+          key: << pipeline.parameters.cache_version >>-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
+      - run:
+          name: Update README.md
+          command: |
+            poetry run \
+              settings-doc generate \
+                --class settings.Settings \
+                --output-format markdown \
+                --heading-offset 1 \
+                --update README.md \
+                --between '<!-- settings-doc start -->' '<!-- settings-doc end -->'
+      - run:
+          name: Check if any changes were made
+          command: |
+            TRUNK_BRANCH="<< pipeline.parameters.git_trunk_branch >>"
+            if [[ "${CIRCLE_BRANCH}" == "$TRUNK_BRANCH" ]]
+            then
+              MAIN_REFERENCE_COMMIT_SHA=$(git rev-parse HEAD~1)
+              echo "Running on $TRUNK_BRANCH; comparing to previous $TRUNK_BRANCH commit (${MAIN_REFERENCE_COMMIT_SHA})"
+            else
+              MAIN_REFERENCE_COMMIT_SHA=$(git merge-base ${CIRCLE_BRANCH} origin/$TRUNK_BRANCH)
+              echo "Running on non-$TRUNK_BRANCH branch; comparing with last $TRUNK_BRANCH commit on branch (${MAIN_REFERENCE_COMMIT_SHA})"
+            fi
+
+            # Summary of changes in given files/dirs. No output if no changes found.
+            DIFF_SUMMARY=$(git diff --shortstat ${MAIN_REFERENCE_COMMIT_SHA}..HEAD README.md)
+
+            if [[ -z "${DIFF_SUMMARY}" ]]; then
+              echo "No changes detected. Skipping."
+              circleci-agent step halt
+            fi
+      # See https://circleci.com/docs/2.0/gh-bb-integration/#creating-a-github-deploy-key
+      - add_ssh_keys:
+          fingerprints:
+            - "41:8b:95:c3:06:c6:2e:f8:24:14:c3:2c:9e:98:e2:bf"
+      - run:
+          name: Set name and email
+          command: |
+            git config --local user.email "$(git log -1 --pretty=%ce)"
+            git config --local user.name "$(git log -1 --pretty=%cn)"
+      - run:
+          name: Add changes
+          command: git add README.md
+      - run:
+          name: Commit changes
+          command: git commit -m "Update generated content"
+      - run:
+          name: Push changes
+          command: git push origin ${CIRCLE_BRANCH}
+
   build_and_push:
     machine:
       image: ubuntu-2004:202107-02
@@ -139,6 +201,10 @@ workflows:
       - test:
           context: mqtt-influxdb-gateway
           name: Tests
+      - generate_documentation:
+          name: Generate documentation
+          requires:
+            - Tests
       - build_and_push:
           name: Build and push docker image
           context:

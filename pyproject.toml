@@ -30,6 +30,7 @@ types-termcolor = "*"
 toml = "^0.10.2"
 types-toml = "*"
 packaging = "^21.2"
+settings-doc = "^0.5.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -159,6 +159,15 @@ Add `--detach` flag to run in the background. You can close the terminal. The se
 
 If you used the `latest` tag, run `docker-compose pull mqtt-influxdb-gateway`.
 
+# Environment variables
+<!--
+    DO NOT EDIT the following section!
+    It is auto-generated with settings-doc in CircleCI and committed
+    back to the repository on changes.
+-->
+<!-- settings-doc start -->
+<!-- settings-doc end -->
+
 # Development
 
 ## Building for ARMv7
@@ -183,4 +192,3 @@ https://github.com/eclipse/paho.mqtt.python#contents
 # TODOs
 
 - Define what to merge data points on.
-- Export settings names descriptions and examples into documentation?
