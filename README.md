@@ -166,6 +166,123 @@ If you used the `latest` tag, run `docker-compose pull mqtt-influxdb-gateway`.
     back to the repository on changes.
 -->
 <!-- settings-doc start -->
+## `LOG_LEVEL`
+
+*Optional*, default value: `INFO`
+
+Logging level.
+
+### Possible values
+
+`TRACE`, `DEBUG`, `INFO`, `SUCCESS`, `WARNING`, `ERROR`, `CRITICAL`
+
+## `INFLUXDB_URL`
+
+**Required**
+
+URL of your InfluxDB Cloud instance.
+## `INFLUXDB_ORGANIZATION_ID`
+
+**Required**
+
+Organization ID. A hexadecimal string. Should be part of the cloud instance URL or in About Organization. This is not the organization name!
+## `INFLUXDB_API_TOKEN`
+
+**Required**
+
+API token with write access to `influxdb_default_bucket`.
+## `INFLUXDB_PRECISION`
+
+*Optional*, default value: `ns`
+
+The precision for the unix timestamps within the body line-protocol.
+
+### Possible values
+
+`s`, `ms`, `ns`, `us`
+
+## `INFLUXDB_DEFAULT_BUCKET`
+
+*Optional*
+
+Default value if `{bucket}` in `mqtt_topic_pattern` below is not set or parsed.
+## `INFLUXDB_DEFAULT_MEASUREMENT`
+
+*Optional*
+
+Default value if `{measurement}` in `mqtt_topic_pattern` below is not set or parsed.
+## `MQTT_HOST`
+
+**Required**
+
+IP address or a host name of an MQTT broker.
+## `MQTT_PORT`
+
+*Optional*, default value: `1883`
+
+Port of the MQTT broker.
+## `MQTT_USERNAME`
+
+*Optional*
+
+User name used to authenticate with the MQTT broker.
+## `MQTT_PASSWORD`
+
+*Optional*
+
+Password used to authenticate with the MQTT broker.
+## `MQTT_TOPIC_SUBSCRIBE`
+
+**Required**
+
+A topic to subscribe to. You can also use the '+' and '#' wildcards.
+## `MQTT_TOPIC_PATTERN`
+
+**Required**
+
+A pattern to parse the topic into fields sent to InfluxDB. Use '{variable}' or '{variable_type:value}' syntax in topic parts to create the match. Use a plain string to ignore a topic part. The pattern must be a prefix of `mqtt_topic_subscribe`.
+
+When both a variable and a `influxdb_*` configuration option are defined, variable takes precedence.
+
+### Examples
+
+`dt/influxdb/{bucket}/{measurement}/{tag:device_id}/{field}/{value_type}` will parse `dt/influxdb/home/environment/esp8266/temperature/float 23.412` into:
+
+```json
+{
+   'bucket': 'home',
+   'measurement': 'environment',
+   'tags': {'device_id': 'esp8266'},
+   'fields': {'temperature': 23.412}
+}
+```
+
+### Possible values
+
+- `{bucket}`: InfluxDB bucket to send data to. Required unless `influxdb_default_bucket` is set.
+- `{measurement}`: InfluxDB measurement field. Required unless `influxdb_default_measurement` is set.
+- `{field}`: Field name. Required.
+- `{value_type}`: Value type used to parse the received data. Optional.
+  Acceptable values in the topic are `str`, `int`, `float` and `bool`. Default value is `str`.
+- `{tag:TAG_NAME}`: where TAG_NAME will be used as a tag name and the parsed value as a value. Optional.
+
+## `MQTT_MERGE_DATA_POINTS_ON`
+
+*Optional*, default value: `{measurement}{bucket}{tags}`
+
+It is expected there will be a single value in each topic. But InfluxDB allows multiple fields to be sent at once (for example from one device). Use this option to define criteria on which to merge data points. The order and any extra characters aside from variables below are irrelevant. All collected fields are then sent to InfluxDB when any of the fields is seen more than once (suggesting new data is coming in).
+
+### Examples
+
+A value of `{tags[device_id]}` will merge all received data that share the same `device_id` tag.
+
+### Possible values
+
+- `{bucket}`
+- `{measurement}`
+- `{tags}`: for all tags and their values
+- `{tags[NAME]}`: for a value of single tag named `NAME`
+
 <!-- settings-doc end -->
 
 # Development
