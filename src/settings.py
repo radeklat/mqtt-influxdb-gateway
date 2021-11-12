@@ -60,10 +60,10 @@ class Settings(BaseSettings):
         "\n"
         "```json\n"
         "{\n"
-        "   'bucket': 'home',\n"
-        "   'measurement': 'environment',\n"
-        "   'tags': {'device_id': 'esp8266'},\n"
-        "   'fields': {'temperature': 23.412}\n"
+        '   "bucket": "home",\n'
+        '   "measurement": "environment",\n'
+        '   "tags": {"device_id": "esp8266"},\n'
+        '   "fields": {"temperature": 23.412}\n'
         "}\n"
         "```",
     )
