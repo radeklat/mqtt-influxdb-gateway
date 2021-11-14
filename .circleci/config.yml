@@ -117,7 +117,7 @@ jobs: # A basic unit of work in a run
           command: git add README.md
       - run:
           name: Commit changes
-          command: git commit -m "Update generated content"
+          command: git commit -m "Update generated content" -m "skip ci"
       - run:
           name: Push changes
           command: git push origin ${CIRCLE_BRANCH}
