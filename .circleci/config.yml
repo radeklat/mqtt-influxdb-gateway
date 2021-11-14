@@ -97,9 +97,18 @@ jobs: # A basic unit of work in a run
                 --update README.md \
                 --between '<!-- settings-doc start -->' '<!-- settings-doc end -->'
       - run:
+          name: Update .env.template
+          command: |
+            poetry run \
+              settings-doc generate \
+                --class settings.Settings \
+                --output-format dotenv \
+                --update .env.template \
+                --between '# Auto-generated content start' '# Auto-generated content end'
+      - run:
           name: Check if any changes were made
           command: |
-            if [[ -z "$(git status -s README.md)" ]]; then
+            if [[ -z "$(git status -s README.md .env.template)" ]]; then
               echo "No changes detected. Skipping."
               circleci-agent step halt
             fi
@@ -114,7 +123,7 @@ jobs: # A basic unit of work in a run
             git config --local user.name "$(git log -1 --pretty=%cn)"
       - run:
           name: Add changes
-          command: git add README.md
+          command: git add README.md .env.template
       - run:
           name: Commit changes
           command: git commit -m "Update generated content" -m "skip ci"
