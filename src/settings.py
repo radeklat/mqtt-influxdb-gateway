@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     mqtt_topic_pattern: str = Field(
         ...,
         description="A pattern to parse the topic into fields sent to InfluxDB. "
-        "Use '{variable}' or '{variable_type:value}' syntax in topic parts to create the "
+        "Use `{variable}` or `{variable_type:value}` syntax in topic parts to create the "
         "match. Use a plain string to ignore a topic part. The pattern must be a prefix of "
         "`mqtt_topic_subscribe`.\n"
         "\n"
