@@ -240,7 +240,7 @@ A topic to subscribe to. You can also use the '+' and '#' wildcards.
 
 **Required**
 
-A pattern to parse the topic into fields sent to InfluxDB. Use '{variable}' or '{variable_type:value}' syntax in topic parts to create the match. Use a plain string to ignore a topic part. The pattern must be a prefix of `mqtt_topic_subscribe`.
+A pattern to parse the topic into fields sent to InfluxDB. Use `{variable}` or `{variable_type:value}` syntax in topic parts to create the match. Use a plain string to ignore a topic part. The pattern must be a prefix of `mqtt_topic_subscribe`.
 
 When both a variable and a `influxdb_*` configuration option are defined, variable takes precedence.
 
