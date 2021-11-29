@@ -15,13 +15,16 @@ parameters:
     default: "3.9"
   cache_version:
     type: string
-    default: "2"
-  dockerhub_username:
-    type: string
-    default: "radeklat"
+    default: "3"
   git_trunk_branch:
     type: string
     default: "main"
+  command_prefix:
+    type: string
+    default: "poetry run delfino"
+  dockerhub_username:
+    type: string
+    default: "radeklat"
 
 jobs: # A basic unit of work in a run
   test:
@@ -38,16 +41,16 @@ jobs: # A basic unit of work in a run
           key: << pipeline.parameters.cache_version >>-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
       - run:
           name: Install dev libraries
-          command: pip install --upgrade pip poetry && poetry install --no-ansi
+          command: pip install --upgrade pip poetry && poetry install --no-ansi --no-root
       - run:
           name: Format check
-          command: poetry run inv format --check
+          command: << pipeline.parameters.command_prefix >> format --check
       - run:
           name: Type check
-          command: poetry run inv typecheck
+          command: << pipeline.parameters.command_prefix >> typecheck
       - run:
           name: Linters
-          command: poetry run inv lint
+          command: << pipeline.parameters.command_prefix >> lint
       - save_cache:
           key: << pipeline.parameters.cache_version >>-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
           paths:
@@ -56,13 +59,13 @@ jobs: # A basic unit of work in a run
             - "/usr/local/lib/python<< pipeline.parameters.python_version >>/site-packages"
       - run:
           name: Unit tests
-          command: poetry run inv test-unit
+          command: << pipeline.parameters.command_prefix >> test-unit
       - run:
           name: Integration tests
-          command: poetry run inv test-integration
+          command: << pipeline.parameters.command_prefix >> test-integration
       - run:
           name: Build coverage report
-          command: poetry run inv coverage-report
+          command: << pipeline.parameters.command_prefix >> coverage-report
       - run:
           name: Upload coverage reports to Codecov
           command: |
@@ -155,7 +158,7 @@ jobs: # A basic unit of work in a run
           key: << pipeline.parameters.cache_version >>-docker-build-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
       - run:
           name: Install dev libraries
-          command: poetry install --no-ansi
+          command: poetry install --no-ansi --no-root
       - save_cache:
           key: << pipeline.parameters.cache_version >>-docker-build-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
           paths:
@@ -166,8 +169,7 @@ jobs: # A basic unit of work in a run
             docker buildx create --use
       - run:
           name: Build and push docker image
-          command: |
-            poetry run inv docker-build
+          command: << pipeline.parameters.command_prefix >> build-docker
   release:
     working_directory: << pipeline.parameters.working_directory >>
     docker:
@@ -180,15 +182,16 @@ jobs: # A basic unit of work in a run
           key: << pipeline.parameters.cache_version >>-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
       - gh/setup
       - run:
-          name: Tag release
+          name: Check if current version has been released
           command: |
-            git fetch --tags origin
             VERSION=$(poetry version -s)
-            if [[ $(git tag | grep -q $VERSION; echo $?) -ne 0 ]]; then
-              gh release create $VERSION -F CHANGELOG.md
-            else
+            if [[ $(gh release view $VERSION >/dev/null 2>&1; echo $?) -eq 0 ]]; then
               echo "Tag '$VERSION' already exists. Skipping."
+              circleci-agent step halt
             fi
+      - run:
+          name: Create a release
+          command: gh release create $(poetry version -s) -F CHANGELOG.md
 
 workflows:
   version: 2
