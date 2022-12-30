@@ -1,21 +1,23 @@
 [tool.poetry]
 name = "mqtt-influxdb-gateway"
-version = "0.2.1"
+version = "0.2.2"
 description = "An MQTT gateway sending data to InfluxDB"
 authors = ["Radek Lát <radek.lat@gmail.com>"]
+homepage = "https://github.com/radeklat/mqtt-influxdb-gateway"
 license = "MIT License"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "==3.9.16"
 pydantic = "^1.8.2"
 influxdb-client = {extras = ["ciso"], version = "^1.22.0"}
 paho-mqtt = "^1.6.1"
-loguru = "^0.5.3"
+loguru = "^0.6.0"  # https://github.com/Delgan/loguru/blob/master/CHANGELOG.rst
 
 [tool.poetry.dev-dependencies]
 types-toml = "*"
-settings-doc = "^0.7.0"
-delfino = {extras = ["verify_all", "build_docker"], version = "^0.8.1"}
+settings-doc = "^1.0.0"
+delfino-core = {extras = ["verify_all", "dependencies-update"], version = "^4.0.0"}
+delfino-docker = "^2.0.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -52,9 +54,6 @@ exclude = '''
 testpaths = "tests/unit tests/integration"
 python_functions = "should_*"
 junit_family = "xunit2"
-# pytest-dotenv settings
-env_override_existing_values = 1
-env_files = ".env.test"
 
 # Structure: https://docs.pytest.org/en/stable/warnings.html
 # Values:    https://docs.python.org/3/library/warnings.html#describing-warning-filters
@@ -78,10 +77,9 @@ follow_imports = "silent"
 [[tool.mypy.overrides]]
 # Source code dependencies
 module = [
-    "invoke.*",
-    "pipenv.*",
-    "influxdb_client.*",
     "paho.*",
+    "influxdb_client.*",
+    "delfino.*",
 ]
 ignore_missing_imports = true
 
@@ -97,17 +95,12 @@ add-ignore = [
     "D413",  # "Missing blank line after last section"
 ]
 
-[tool.delfino]
-sources_directory = "src"
-tests_directory = "tests"
-reports_directory = "reports"
-test_types = ["unit", "integration"]
-disable_commands = ["upload-to-pypi"]
+[tool.delfino.plugins.delfino-core]
 
-[tool.delfino.dockerhub]
-username = "radeklat"
+[tool.delfino.plugins.delfino-docker.docker_build]
+dockerhub_username = "radeklat"
 build_for_platforms = [
+    "linux/arm/v7",
     "linux/amd64",
     "linux/arm64",
-    "linux/arm/v7",
 ]

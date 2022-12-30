@@ -85,7 +85,7 @@ class Settings(BaseSettings):
     )
 
     @validator("log_level")
-    def valid_log_level(cls, value, field):  # pylint: disable=no-self-argument, no-self-use
+    def valid_log_level(cls, value, field):  # pylint: disable=no-self-argument
         if value not in LOG_LEVELS:
             raise ValueError(f"'{value}' is not allowed as a value for '{field}'. Allowed values are: {LOG_LEVELS}.")
         return value

@@ -181,16 +181,19 @@ Logging level.
 **Required**
 
 URL of your InfluxDB Cloud instance.
+
 ## `INFLUXDB_ORGANIZATION_ID`
 
 **Required**
 
 Organization ID. A hexadecimal string. Should be part of the cloud instance URL or in About Organization. This is not the organization name!
+
 ## `INFLUXDB_API_TOKEN`
 
 **Required**
 
 API token with write access to `influxdb_default_bucket`.
+
 ## `INFLUXDB_PRECISION`
 
 *Optional*, default value: `ns`
@@ -206,36 +209,43 @@ The precision for the unix timestamps within the body line-protocol.
 *Optional*
 
 Default value if `{bucket}` in `mqtt_topic_pattern` below is not set or parsed.
+
 ## `INFLUXDB_DEFAULT_MEASUREMENT`
 
 *Optional*
 
 Default value if `{measurement}` in `mqtt_topic_pattern` below is not set or parsed.
+
 ## `MQTT_HOST`
 
 **Required**
 
 IP address or a host name of an MQTT broker.
+
 ## `MQTT_PORT`
 
 *Optional*, default value: `1883`
 
 Port of the MQTT broker.
+
 ## `MQTT_USERNAME`
 
 *Optional*
 
 User name used to authenticate with the MQTT broker.
+
 ## `MQTT_PASSWORD`
 
 *Optional*
 
 Password used to authenticate with the MQTT broker.
+
 ## `MQTT_TOPIC_SUBSCRIBE`
 
 **Required**
 
 A topic to subscribe to. You can also use the '+' and '#' wildcards.
+
 ## `MQTT_TOPIC_PATTERN`
 
 **Required**
@@ -265,6 +275,7 @@ When both a variable and a `influxdb_*` configuration option are defined, variab
 - `{value_type}`: Value type used to parse the received data. Optional.
   Acceptable values in the topic are `str`, `int`, `float` and `bool`. Default value is `str`.
 - `{tag:TAG_NAME}`: where TAG_NAME will be used as a tag name and the parsed value as a value. Optional.
+
 
 ## `MQTT_MERGE_DATA_POINTS_ON`
 

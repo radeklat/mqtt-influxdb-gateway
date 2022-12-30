@@ -4,10 +4,13 @@ FROM python:${PYTHON_VERSION}-slim
 WORKDIR /app
 
 RUN apt-get --allow-releaseinfo-change update && \
-    apt-get install gcc g++ libssl-dev libffi-dev rustc -y && \
+    apt-get install gcc g++ libssl-dev libffi-dev -y && \
     rm -rf /var/lib/apt/*
 RUN python -m pip install --upgrade pip
-RUN pip install poetry
+
+# Doesn't build consistently for armv7
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
+RUN pip install "cryptography<3.5" poetry
 
 COPY pyproject.toml poetry.lock ./
 
