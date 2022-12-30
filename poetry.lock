@@ -155,7 +155,7 @@ verify-all = ["black", "coverage", "isort", "mypy", "pre-commit", "psutil", "pyc
 
 [[package]]
 name = "delfino-docker"
-version = "2.0.0"
+version = "2.0.1"
 description = "A delfino plugin with helper scripts for working with docker."
 category = "dev"
 optional = false
@@ -785,7 +785,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = "==3.9.16"
-content-hash = "60515c779d1a6bc81d695ac7b491954684f14a6ee8a8c3d085e7272881843c68"
+content-hash = "e130915c2d59a4f177c473bc1b704dab6228b7ba9b669f5637f6102068cafd18"
 
 [metadata.files]
 astroid = [
@@ -935,8 +935,8 @@ delfino-core = [
     {file = "delfino_core-4.0.1.tar.gz", hash = "sha256:7d5ed36e35bca07c9c3381298a4fbc579011267f7e837be17c30719f5a69965a"},
 ]
 delfino-docker = [
-    {file = "delfino_docker-2.0.0-py3-none-any.whl", hash = "sha256:bc03fc8872242b9b45422c5c8fdd6b1dcacd32685e379843b022861cbca82b50"},
-    {file = "delfino_docker-2.0.0.tar.gz", hash = "sha256:0def1201da719aab3fc816f335778f68afd44d3c7b85339f656a847512fb04f3"},
+    {file = "delfino_docker-2.0.1-py3-none-any.whl", hash = "sha256:0dcd870729519ec32fb2e4ccb9699107f6303934060ad8e20613472fee18f2be"},
+    {file = "delfino_docker-2.0.1.tar.gz", hash = "sha256:758b7c1c99e578cccbcb85dd928999fd4d25eceb02ce74cb011cda1c2c14d8ea"},
 ]
 deprecation = [
     {file = "deprecation-2.1.0-py2.py3-none-any.whl", hash = "sha256:a10811591210e1fb0e768a8c25517cabeabcba6f0bf96564f8ff45189f90b14a"},

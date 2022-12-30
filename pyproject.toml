@@ -17,7 +17,7 @@ loguru = "^0.6.0"  # https://github.com/Delgan/loguru/blob/master/CHANGELOG.rst
 types-toml = "*"
 settings-doc = "^1.0.0"
 delfino-core = {extras = ["verify_all", "dependencies-update"], version = "^4.0.0"}
-delfino-docker = "^2.0.0"
+delfino-docker = "^2.0.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -101,6 +101,6 @@ add-ignore = [
 dockerhub_username = "radeklat"
 build_for_platforms = [
     "linux/arm/v7",
-    "linux/arm64",
     "linux/amd64",
+    "linux/arm64",
 ]
