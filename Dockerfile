@@ -8,6 +8,7 @@ RUN apt-get --allow-releaseinfo-change update && \
     rm -rf /var/lib/apt/*
 RUN python -m pip install --upgrade pip
 
+# Doesn't build consistently for armv7
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 RUN pip install "cryptography<3.5" poetry
 
