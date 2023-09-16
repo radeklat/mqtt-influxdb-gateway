@@ -5,7 +5,7 @@
     <img alt="CircleCI" src="https://img.shields.io/circleci/build/github/radeklat/mqtt-influxdb-gateway">
     <img alt="Codecov" src="https://img.shields.io/codecov/c/github/radeklat/mqtt-influxdb-gateway">
     <img alt="GitHub tag (latest SemVer)" src="https://img.shields.io/github/tag/radeklat/mqtt-influxdb-gateway">
-    <img alt="Maintenance" src="https://img.shields.io/maintenance/yes/2021">
+    <img alt="Maintenance" src="https://img.shields.io/maintenance/yes/2023">
     <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/radeklat/mqtt-influxdb-gateway">
     <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/radeklat/mqtt-influxdb-gateway">
     <img alt="Docker Image Version (latest semver)" src="https://img.shields.io/docker/v/radeklat/mqtt-influxdb-gateway?label=image%20version">
