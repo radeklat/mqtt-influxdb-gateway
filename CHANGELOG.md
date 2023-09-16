@@ -12,19 +12,26 @@ Types of changes are:
 
 ## [Unreleased]
 
-## [0.2.2] - 2012-12-30
+## [0.2.3] - 2023-09-16
+
+### Fixes
+
+- Switch `settings-doc` from CI to `pre-commit` hook.
+- 
+
+## [0.2.2] - 2022-12-30
 
 ### Fixes
 
 - Dependencies update
 
-## [0.2.1] - 2011-11-07
+## [0.2.1] - 2021-11-07
 
 ### Fixes
 
 - Improved environment variables documentation.
 
-## [0.2.0] - 2011-11-02
+## [0.2.0] - 2021-11-02
 
 ### Features
 
@@ -34,13 +41,13 @@ Types of changes are:
 - Options to set global bucket and measurement with `influxdb_default_bucket` and `influxdb_default_measurement`.
 - Documentation of settings.
 
-## [0.1.2] - 2011-10-31
+## [0.1.2] - 2021-10-31
 
 ### Features
 
 - Change `Dockerfile` to use Python version from `pyproject.toml`.
 
-## [0.1.1] - 2011-10-30
+## [0.1.1] - 2021-10-30
 
 ### Features
 
@@ -50,11 +57,12 @@ Types of changes are:
 
 - docker-compose file not starting up the container correctly.
 
-## [0.1.0] - 2011-10-28
+## [0.1.0] - 2021-10-28
 
 - Initial release
 
-[Unreleased]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.2...HEAD
+[Unreleased]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.3...HEAD
+[0.2.3]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.1...0.2.3
 [0.2.2]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.1...0.2.2
 [0.2.1]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.1.2...0.2.0

@@ -1,6 +1,6 @@
 # See https://pre-commit.com/ for usage and config
 default_language_version:
-  python: python3.8
+  python: python3.9
 repos:
 - repo: local
   hooks:
@@ -10,3 +10,34 @@ repos:
     language: system
     entry: poetry run delfino format
     pass_filenames: false
+- repo: https://github.com/radeklat/settings-doc
+  rev: '2.1.0'
+  hooks:
+    - id: settings-doc-markdown
+      name: Update Settings documentation
+      description: Update Settings documentation in README.md
+      args:
+        - "--class"
+        - "settings.Settings"
+        - "--output-format"
+        - "markdown"
+        - "--heading-offset"
+        - "1"
+        - "--update"
+        - "README.md"
+        - "--between"
+        - "<!-- settings-doc start -->"
+        - "<!-- settings-doc end -->"
+- repo: https://github.com/radeklat/settings-doc
+  rev: '2.1.0'
+  hooks:
+    - id: settings-doc-dotenv
+      name: Update .env template
+      args:
+        - "--class"
+        - "settings.Settings"
+        - "--update"
+        - ".env.template"
+        - "--between"
+        - "# Auto-generated content start"
+        - "# Auto-generated content end"
