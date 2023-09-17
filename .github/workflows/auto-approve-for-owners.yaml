@@ -5,29 +5,16 @@ on:
     types:
       - opened
       - synchronize
+      - auto_merge_enabled
 
 jobs:
   auto-approve:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.user.login == github.repository_owner
+    if: github.event.pull_request.user.login == github.repository_owner && github.event.pull_request.auto_merge != null
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Mark previous reviews as outdated
-        run: |
-          REVIEWS=$(curl -s \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews")
-          for review_id in $(echo "$REVIEWS" | jq -r '.[] | select(.user.login=="github-actions[bot]") | .id'); do
-            curl -s -X PUT \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews/$review_id/dismissals" \
-              -d '{"message": "Outdated review due to new commit."}'
-          done
+        uses: actions/checkout@v2
 
       - name: Auto-approve pull request
         run: |
@@ -35,4 +22,4 @@ jobs:
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" \
-            -d '{"event": "APPROVE", "body": "Auto-approved because this PR was opened by the repository owner."}'
+            -d '{"event": "APPROVE", "body": "Auto-approved because this PR was opened by the repository owner and auto-merge is enabled."}'
