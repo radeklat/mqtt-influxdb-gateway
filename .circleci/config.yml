@@ -85,12 +85,31 @@ jobs: # A basic unit of work in a run
       image: ubuntu-2004:202107-02
     steps:
       - checkout
+      - restore_cache:
+          key: << pipeline.parameters.cache_version >>-docker-build-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
       - run:
-          name: Install dev libraries
-          command: pip3 install poetry
+          name: Install and activate required Python version
+          command: |
+            export VERSION="<< pipeline.parameters.python_version >>"
+            if [[ ! -d "/opt/circleci/.pyenv/versions/${VERSION}" ]]; then
+              echo "Python ${VERSION} not installed."
+
+              if [[ -z "$(pyenv install --list | grep -q ${VERSION})" ]]; then
+                echo "Python ${VERSION} not available. Trying a pyenv update ..."            
+                cd /opt/circleci/.pyenv/plugins/python-build/../.. && git checkout master && git pull && cd -
+              fi
+              pyenv install ${VERSION}
+            else
+              echo "Python ${VERSION} already installed."
+            fi
+            pyenv global ${VERSION}
+      - run:
+          name: Install poetry
+          command: curl -sSL https://install.python-poetry.org | python3 -
       - run:
           name: Check if build needed
           command: |
+            export PATH="/home/circleci/.local/bin:$PATH"
             export DOCKER_CLI_EXPERIMENTAL=enabled
             IMAGE_VERSION="$(poetry version -s)"
             tag_exists="$(docker manifest inspect << pipeline.parameters.dockerhub_username >>/<< pipeline.parameters.project_name >>:$IMAGE_VERSION >/dev/null 2>&1; echo $?)"
@@ -100,8 +119,6 @@ jobs: # A basic unit of work in a run
             else
               echo "Image tag '$IMAGE_VERSION' doesn't exist in the repository. Running build."
             fi
-      - restore_cache:
-          key: << pipeline.parameters.cache_version >>-docker-build-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
       - run:
           name: Install dev libraries
           command: poetry install --no-ansi --no-root
