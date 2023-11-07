@@ -105,7 +105,7 @@ jobs: # A basic unit of work in a run
             pyenv global ${VERSION}
       - run:
           name: Install poetry
-          command: curl -sSL https://install.python-poetry.org | python3 -
+          command: pip3 install poetry
       - run:
           name: Check if build needed
           command: |
