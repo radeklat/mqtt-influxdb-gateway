@@ -1,17 +1,22 @@
 from functools import cache
 from typing import Literal, Optional
 
-from pydantic import BaseSettings, Field, validator
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings
 
 from constants import LEVEL_DEFAULT, LOG_LEVELS
 
 
 class Settings(BaseSettings):
-    log_level: str = Field(default=LEVEL_DEFAULT, description="Logging level.", possible_values=LOG_LEVELS)
+    log_level: Literal["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"] = Field(
+        default=LEVEL_DEFAULT, description="Logging level."
+    )
 
     # Configuration of access to InfluxDB Cloud.
     influxdb_url: str = Field(
-        ..., description="URL of your InfluxDB Cloud instance.", regex=r"https://.*\.influxdata.com"
+        ...,
+        description="URL of your InfluxDB Cloud instance.",
+        pattern=r"https://.*\.influxdata.com",
     )
     influxdb_organization_id: str = Field(
         ...,
@@ -20,13 +25,16 @@ class Settings(BaseSettings):
     )
     influxdb_api_token: str = Field(..., description="API token with write access to `influxdb_default_bucket`.")
     influxdb_precision: Literal["s", "ms", "ns", "us"] = Field(
-        default="ns", description="The precision for the unix timestamps within the body line-protocol."
+        default="ns",
+        description="The precision for the unix timestamps within the body line-protocol.",
     )
     influxdb_default_bucket: Optional[str] = Field(
-        None, description="Default value if `{bucket}` in `mqtt_topic_pattern` below is not set or parsed."
+        None,
+        description="Default value if `{bucket}` in `mqtt_topic_pattern` below is not set or parsed.",
     )
     influxdb_default_measurement: Optional[str] = Field(
-        None, description="Default value if `{measurement}` in `mqtt_topic_pattern` below is not set or parsed."
+        None,
+        description="Default value if `{measurement}` in `mqtt_topic_pattern` below is not set or parsed.",
     )
 
     mqtt_host: str = Field(..., description="IP address or a host name of an MQTT broker.")
@@ -34,7 +42,8 @@ class Settings(BaseSettings):
     mqtt_username: Optional[str] = Field(None, description="User name used to authenticate with the MQTT broker.")
     mqtt_password: Optional[str] = Field(None, description="Password used to authenticate with the MQTT broker.")
     mqtt_topic_subscribe: str = Field(
-        ..., description="A topic to subscribe to. You can also use the '+' and '#' wildcards."
+        ...,
+        description="A topic to subscribe to. You can also use the '+' and '#' wildcards.",
     )
     mqtt_topic_pattern: str = Field(
         ...,
@@ -44,28 +53,41 @@ class Settings(BaseSettings):
         "`mqtt_topic_subscribe`.\n"
         "\n"
         "When both a variable and a `influxdb_*` configuration option are defined, variable takes precedence.",
-        possible_values=[
-            ("{bucket}", "InfluxDB bucket to send data to. Required unless `influxdb_default_bucket` is set."),
-            ("{measurement}", "InfluxDB measurement field. Required unless `influxdb_default_measurement` is set."),
-            ("{field}", "Field name. Required."),
-            (
-                "{value_type}",
-                "Value type used to parse the received data. Optional.\n  Acceptable values in the topic are "
-                "`str`, `int`, `float` and `bool`. Default value is `str`.",
+        json_schema_extra={
+            "possible_values": [
+                (
+                    "{bucket}",
+                    "InfluxDB bucket to send data to. Required unless `influxdb_default_bucket` is set.",
+                ),
+                (
+                    "{measurement}",
+                    "InfluxDB measurement field. Required unless `influxdb_default_measurement` is set.",
+                ),
+                ("{field}", "Field name. Required."),
+                (
+                    "{value_type}",
+                    "Value type used to parse the received data. Optional.\n  Acceptable values in the topic are "
+                    "`str`, `int`, `float` and `bool`. Default value is `str`.",
+                ),
+                (
+                    "{tag:TAG_NAME}",
+                    "where TAG_NAME will be used as a tag name and the parsed value as a value. Optional.",
+                ),
+            ],
+            "examples": (
+                "`dt/influxdb/{bucket}/{measurement}/{tag:device_id}/{field}/{value_type}` "
+                "will parse `dt/influxdb/home/environment/esp8266/temperature/float 23.412` into:\n"
+                "\n"
+                "```json\n"
+                "{\n"
+                '   "bucket": "home",\n'
+                '   "measurement": "environment",\n'
+                '   "tags": {"device_id": "esp8266"},\n'
+                '   "fields": {"temperature": 23.412}\n'
+                "}\n"
+                "```"
             ),
-            ("{tag:TAG_NAME}", "where TAG_NAME will be used as a tag name and the parsed value as a value. Optional."),
-        ],
-        example="`dt/influxdb/{bucket}/{measurement}/{tag:device_id}/{field}/{value_type}` "
-        "will parse `dt/influxdb/home/environment/esp8266/temperature/float 23.412` into:\n"
-        "\n"
-        "```json\n"
-        "{\n"
-        '   "bucket": "home",\n'
-        '   "measurement": "environment",\n'
-        '   "tags": {"device_id": "esp8266"},\n'
-        '   "fields": {"temperature": 23.412}\n'
-        "}\n"
-        "```",
+        },
     )
     mqtt_merge_data_points_on: str = Field(
         default="{measurement}{bucket}{tags}",
@@ -75,16 +97,22 @@ class Settings(BaseSettings):
         "any extra characters aside from variables below are irrelevant. All collected fields "
         "are then sent to InfluxDB when any of the fields is seen more than once (suggesting "
         "new data is coming in).",
-        possible_values=[
-            ("{bucket}",),
-            ("{measurement}",),
-            ("{tags}", "for all tags and their values"),
-            ("{tags[NAME]}", "for a value of single tag named `NAME`"),
-        ],
-        example="A value of `{tags[device_id]}` will merge all received data that share the same `device_id` tag.",
+        json_schema_extra={
+            "possible_values": [
+                ("{bucket}",),
+                ("{measurement}",),
+                ("{tags}", "for all tags and their values"),
+                ("{tags[NAME]}", "for a value of single tag named `NAME`"),
+            ],
+            "examples": (
+                "A value of `{tags[device_id]}` will merge all received data that share the same `device_id` tag."
+            ),
+        },
     )
 
-    @validator("log_level")
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
+    @field_validator("log_level")
     def valid_log_level(cls, value, field):  # pylint: disable=no-self-argument
         if value not in LOG_LEVELS:
             raise ValueError(f"'{value}' is not allowed as a value for '{field}'. Allowed values are: {LOG_LEVELS}.")
@@ -93,4 +121,4 @@ class Settings(BaseSettings):
 
 @cache
 def get_settings() -> Settings:
-    return Settings()
+    return Settings()  # type: ignore[call-arg]

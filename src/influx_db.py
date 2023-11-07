@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Any, ClassVar, Dict, Set, Type, Union
+from typing import Any, ClassVar, Union
 
 from pydantic import BaseModel, Field
 
@@ -20,12 +20,12 @@ class MergeConflict(Exception):
 class InfluxDBLine(BaseModel, metaclass=FieldAccessMeta):
     measurement: str
     bucket: str
-    fields: Dict[str, Any]
-    tags: Dict[str, str] = Field(default_factory=dict)
+    fields: dict[str, Any]
+    tags: dict[str, str] = Field(default_factory=dict)
     time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    _VALID_TYPES: Set[Type] = {str, int, bool, float}
-    _VALID_TYPE_NAMES: Dict[str, Type] = {_.__name__: _ for _ in _VALID_TYPES}
+    _VALID_TYPES: set[type] = {str, int, bool, float}
+    _VALID_TYPE_NAMES: dict[str, type] = {_.__name__: _ for _ in _VALID_TYPES}
 
     _merge_on: ClassVar[str] = ""
 
@@ -43,7 +43,7 @@ class InfluxDBLine(BaseModel, metaclass=FieldAccessMeta):
         cls,
         measurement: str,
         bucket: str,
-        tags: Dict[str, str],
+        tags: dict[str, str],
         field: str,
         value: str,
         value_type: str = "str",

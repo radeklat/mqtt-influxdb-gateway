@@ -12,6 +12,12 @@ Types of changes are:
 
 ## [Unreleased]
 
+## [0.2.4] - 2023-11-07
+
+### Fixes
+
+- Update `pydantic` to `2.x`.
+
 ## [0.2.3] - 2023-09-16
 
 ### Fixes
@@ -61,8 +67,9 @@ Types of changes are:
 
 - Initial release
 
-[Unreleased]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.3...HEAD
-[0.2.3]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.1...0.2.3
+[Unreleased]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.4...HEAD
+[0.2.4]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.3...0.2.4
+[0.2.3]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.2...0.2.3
 [0.2.2]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.1...0.2.2
 [0.2.1]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/radeklat/mqtt-influxdb-gateway/compare/0.1.2...0.2.0

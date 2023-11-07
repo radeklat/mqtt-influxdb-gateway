@@ -206,13 +206,13 @@ The precision for the unix timestamps within the body line-protocol.
 
 ## `INFLUXDB_DEFAULT_BUCKET`
 
-*Optional*
+*Optional*, default value: `None`
 
 Default value if `{bucket}` in `mqtt_topic_pattern` below is not set or parsed.
 
 ## `INFLUXDB_DEFAULT_MEASUREMENT`
 
-*Optional*
+*Optional*, default value: `None`
 
 Default value if `{measurement}` in `mqtt_topic_pattern` below is not set or parsed.
 
@@ -230,13 +230,13 @@ Port of the MQTT broker.
 
 ## `MQTT_USERNAME`
 
-*Optional*
+*Optional*, default value: `None`
 
 User name used to authenticate with the MQTT broker.
 
 ## `MQTT_PASSWORD`
 
-*Optional*
+*Optional*, default value: `None`
 
 Password used to authenticate with the MQTT broker.
 
@@ -276,7 +276,6 @@ When both a variable and a `influxdb_*` configuration option are defined, variab
   Acceptable values in the topic are `str`, `int`, `float` and `bool`. Default value is `str`.
 - `{tag:TAG_NAME}`: where TAG_NAME will be used as a tag name and the parsed value as a value. Optional.
 
-
 ## `MQTT_MERGE_DATA_POINTS_ON`
 
 *Optional*, default value: `{measurement}{bucket}{tags}`
@@ -293,7 +292,6 @@ A value of `{tags[device_id]}` will merge all received data that share the same 
 - `{measurement}`
 - `{tags}`: for all tags and their values
 - `{tags[NAME]}`: for a value of single tag named `NAME`
-
 <!-- settings-doc end -->
 
 # Development
