@@ -1,12 +1,11 @@
 import sys
-from typing import Dict
 
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import ASYNCHRONOUS
 from loguru import logger
 from paho.mqtt.client import Client as MQTTClient
 from paho.mqtt.client import MQTTMessage
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from constants import LOGGING_FORMAT
 from influx_db import InfluxDBLine, MergeConflict
@@ -17,10 +16,8 @@ from settings import get_settings
 class UserData(BaseModel):
     influxdb_client: InfluxDBClient
     topic_to_fields: TopicToFieldsMapper
-    data_aggregator: Dict[str, InfluxDBLine] = Field(default_factory=dict)
-
-    class Config:
-        arbitrary_types_allowed = True
+    data_aggregator: dict[str, InfluxDBLine] = Field(default_factory=dict)
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 def on_connect(client: MQTTClient, userdata: UserData, flags, result_code: int) -> None:

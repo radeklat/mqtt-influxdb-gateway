@@ -1,5 +1,3 @@
-from typing import Tuple
-
 LEVEL_TRACE = "TRACE"
 LEVEL_DEBUG = "DEBUG"
 LEVEL_INFO = "INFO"
@@ -9,7 +7,7 @@ LEVEL_ERROR = "ERROR"
 LEVEL_CRITICAL = "CRITICAL"
 LEVEL_DEFAULT = LEVEL_INFO
 
-LOG_LEVELS: Tuple[str, ...] = (
+LOG_LEVELS: tuple[str, ...] = (
     LEVEL_TRACE,
     LEVEL_DEBUG,
     LEVEL_INFO,

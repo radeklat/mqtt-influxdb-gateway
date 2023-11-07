@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Dict, List, Optional, Set, Union
+from typing import Optional, Union
 
 from influx_db import InfluxDBLine, Tag
 
@@ -14,16 +14,16 @@ class TopicToFieldsMapper:
     _AVAILABLE_FIELDS = deepcopy(_REQUIRED_FIELDS).union({InfluxDBLine.fields_.tags.name, "value_type"})
 
     def __init__(self, topic_pattern: str, default_bucket: Optional[str], default_measurement: Optional[str]):
-        self._default_kwargs: Dict[str, str] = {}
+        self._default_kwargs: dict[str, str] = {}
         if default_bucket:
             self._default_kwargs[InfluxDBLine.fields_.bucket.name] = default_bucket
         if default_measurement:
             self._default_kwargs[InfluxDBLine.fields_.measurement.name] = default_measurement
         self._pattern_parts = self._parse_patten(topic_pattern)
 
-    def _parse_patten(self, topic_pattern: str) -> List[Union[str, Tag, None]]:
-        parsed_variables: List[Union[str, Tag, None]] = []
-        seen_variables: Set[str] = set()
+    def _parse_patten(self, topic_pattern: str) -> list[Union[str, Tag, None]]:
+        parsed_variables: list[Union[str, Tag, None]] = []
+        seen_variables: set[str] = set()
 
         for part in topic_pattern.split(self._SPLIT_CHR):
             if not part or part[0] != "{" or part[-1] != "}":
@@ -52,8 +52,8 @@ class TopicToFieldsMapper:
         return parsed_variables
 
     def to_influxdb_line(self, topic: str, value: str) -> InfluxDBLine:
-        kwargs: Dict[str, str] = deepcopy(self._default_kwargs)
-        tags: Dict[str, str] = {}
+        kwargs: dict[str, str] = deepcopy(self._default_kwargs)
+        tags: dict[str, str] = {}
 
         for pattern, part in zip(self._pattern_parts, topic.split(self._SPLIT_CHR)):
             if not pattern:

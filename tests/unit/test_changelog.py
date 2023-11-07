@@ -1,19 +1,18 @@
 import re
 from collections import Counter
 from pathlib import Path
-from typing import List
 
 import pytest
 
 
 @pytest.fixture(scope="module")
 def changelog() -> str:
-    with open(Path(__file__).parent.parent.parent / "CHANGELOG.md", "r", encoding="utf8") as changelog:
+    with open(Path(__file__).parent.parent.parent / "CHANGELOG.md", encoding="utf8") as changelog:
         return changelog.read()
 
 
 @pytest.fixture(scope="module")
-def all_versions(changelog) -> List[str]:
+def all_versions(changelog) -> list[str]:
     return re.findall(r"## \[([0-9]+\.[0-9]+\.[0-9]+)\]", changelog)
 
 

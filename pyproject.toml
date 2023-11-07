@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mqtt-influxdb-gateway"
-version = "0.2.3"
+version = "0.2.4"
 description = "An MQTT gateway sending data to InfluxDB"
 authors = ["Radek Lát <radek.lat@gmail.com>"]
 homepage = "https://github.com/radeklat/mqtt-influxdb-gateway"
@@ -8,15 +8,19 @@ license = "MIT License"
 
 [tool.poetry.dependencies]
 python = "==3.9.16"
-pydantic = "^1.8.2"
+pydantic = "^2.0"
 influxdb-client = {extras = ["ciso"], version = "^1.22.0"}
 paho-mqtt = "^1.6.1"
-loguru = "^0.6.0"  # https://github.com/Delgan/loguru/blob/master/CHANGELOG.rst
+loguru = "^0.7.1"  # https://github.com/Delgan/loguru/blob/master/CHANGELOG.rst
+pydantic-settings = "^2.0.3"
 
 [tool.poetry.dev-dependencies]
 types-toml = "*"
-delfino-core = {extras = ["verify_all", "dependencies-update"], version = "^4.0.0"}
-delfino-docker = "^2.0.1"
+delfino-core = {extras = ["verify", "dependencies-update"], version = "^7.0"}  # https://github.com/radeklat/delfino-core/blob/main/CHANGELOG.md
+delfino-docker = "^4.0"  # https://github.com/radeklat/delfino-docker/blob/main/CHANGELOG.md
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
