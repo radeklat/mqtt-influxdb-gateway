@@ -95,8 +95,21 @@ jobs: # A basic unit of work in a run
               echo "Python ${VERSION} not installed."
 
               if [[ -z "$(pyenv install --list | grep -q ${VERSION})" ]]; then
-                echo "Python ${VERSION} not available. Trying a pyenv update ..."            
-                cd /opt/circleci/.pyenv/plugins/python-build/../.. && git checkout master && git pull && cd -
+                echo "Python ${VERSION} not available. Trying a pyenv update ..."
+                cd /opt/circleci/.pyenv
+            
+                # Fix permissions
+                sudo chown -R circleci:circleci .
+            
+                # Fix remote
+                git remote remove origin
+                git remote add origin https://github.com/pyenv/pyenv.git
+                git fetch --all
+            
+                # Update
+                git checkout master
+                git pull
+                cd -
               fi
               pyenv install ${VERSION}
             else
@@ -105,7 +118,10 @@ jobs: # A basic unit of work in a run
             pyenv global ${VERSION}
       - run:
           name: Install poetry
-          command: pip3 install poetry
+          command: pip install poetry
+      - run:
+          name: Install dev libraries
+          command: poetry install --no-ansi --no-root
       - save_cache:
           key: << pipeline.parameters.cache_version >>-docker-build-<< pipeline.parameters.project_name >>-<< pipeline.parameters.python_version >>-{{ checksum "poetry.lock" }}
           paths:
@@ -123,9 +139,6 @@ jobs: # A basic unit of work in a run
             else
               echo "Image tag '$IMAGE_VERSION' doesn't exist in the repository. Running build."
             fi
-      - run:
-          name: Install dev libraries
-          command: poetry install --no-ansi --no-root
       - run:
           name: Create and use a new docker build driver
           command: |
